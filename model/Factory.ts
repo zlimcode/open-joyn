@@ -319,6 +319,21 @@ class Factory {
     }
 
     /**
+     * Generate some Fritten
+     * @category Building
+     */
+    fritten() {
+        let nR = () => Math.random() * 2 - 1;
+        let count = 5 + Math.random() * 5;
+        for (let i =0; i < count; i++) {
+            let posLower: vec3 = [nR() * 40, nR() * 40, 0];
+            let posUpper: vec3 = [nR() * 400, nR() * 400, 1000];
+
+            this.bar({position: posLower, to: posUpper});
+        }
+    }
+
+    /**
      * Join all Bars that have been generated so far.
      * @category Connecting
      */
