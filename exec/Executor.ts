@@ -49,7 +49,7 @@ class Executor {
 
 
     private handleMessage(ev: MessageEvent) {
-        console.debug("Got a message from runner", ev.data);
+        console.log("Got a message from runner", ev.data);
 
         let data = ev.data;
         let type = data.type;

@@ -6,6 +6,7 @@ import Parameter from "./Parameter";
 
 import Bar from "./Bar";
 import Panel from "./Panel";
+import Marker from "./Marker";
 
 import Factory from "./Factory";
 
@@ -25,5 +26,4 @@ TypedJSON.mapType(THREE.Quaternion, {
 });
 
 
-
-export { Construction, Meta, Parameter, PartBase, Bar, Panel, Factory };
+export { Construction, Meta, Parameter, PartBase, Marker, Bar, Panel, Factory };

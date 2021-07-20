@@ -24,6 +24,10 @@ class Construction {
         this.connections = [];
     }
 
+    get bars() {
+        return this.parts.filter((p) => p instanceof Bar) as Bar[];
+    }
+
     addPart(part: PartBase, group?: string) {
         this.parts.push(part);
         // TODO: implement groups

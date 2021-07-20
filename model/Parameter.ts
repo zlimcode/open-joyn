@@ -25,7 +25,7 @@ class Parameter {
     options?: any[];
 
     @jsonMember(String)
-    unit?: string
+    unit?: string;
 
     constructor(p: Partial<Parameter>) {
         Object.assign(this, p);
@@ -53,6 +53,22 @@ class Parameter {
 
     hasRange() {
         return this.min !== undefined || this.max !== undefined;
+    }
+
+    hasOptions() {
+        return this.options;
+    }
+
+    normalizedOptions(): [any, any][] {
+        let out = this.options.map((o) => {
+            if (Array.isArray(o)) {
+                return o;
+            }
+
+            return [o, o];
+        });
+
+        return out as [any, any][];
     }
 }
 
