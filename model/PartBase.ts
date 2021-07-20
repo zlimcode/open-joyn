@@ -31,14 +31,14 @@ abstract class PartBase {
 /**
  * A vector of two components. It is just an array of three numbers.
  * 
- * Usually they represent `[x, y, z]`
+ * Usually they represent `[width, height]`
  */
 type vec2 = [number, number];
 
 /**
  * A vector of three components. It is just an array of three numbers.
  * 
- * Usually they represent `[width, height]`
+ * Usually they represent `[x, y, z]`
  */
 type vec3 = [number, number, number];
 

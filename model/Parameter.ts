@@ -1,8 +1,52 @@
 import { jsonObject, jsonMember, jsonArrayMember, AnyT } from "typedjson";
 
+/**
+ * Parameter options.
+ * 
+ * Depending on the given [[value]], the logic will figure out the respective widget to display.
+ * 
+ * If [[min]] and [[max]] are set for a numeric value, a slider will be displayed.
+ * Defining [[options]] will display a dropdown menu.
+ * #### Examples
+ * @example 
+ * { name: "width", label: "Width", value: 600, min: 300, max: 1500, step: 100, unit: "mm" }
+ * @example
+ * { name: "barSize", label: "Bar Stock", value: 30, options: [["30x30", 30], ["40x40", 40], ["60x60", 60]], unit: "mm" }
+ * 
+ * @category Meta
+ */
+interface ParameterOptions {
+    /** Name of the parameter. Must not contain whitespaces and special characters. Cannot start with a number! */
+    name: string;
 
+    /** Default value. Also determines type. */
+    value: any;
+
+    /** Label to display in the UI. */
+    label?: string;
+
+    /** Minimum value for numbers. */
+    min?: number;
+
+    /** Maximum value for numbers. */
+    max?: number;
+
+    /** Step size for numbers. */
+    step?: number;
+
+    /** List of options. Can either be a plain array of the same type as [[value]], or an array of pairs like `["Label", 123]` */
+    options?: any[] | [string, any][];
+
+    /** Unit to display. */
+    unit?: string;
+}
+
+/**
+ * Parameter options
+ * @category Meta
+ */
 @jsonObject
-class Parameter {
+class Parameter implements ParameterOptions {
     @jsonMember(String)
     name: string;
 
@@ -27,7 +71,7 @@ class Parameter {
     @jsonMember(String)
     unit?: string;
 
-    constructor(p: Partial<Parameter>) {
+    constructor(p: ParameterOptions) {
         Object.assign(this, p);
     }
 
@@ -73,3 +117,4 @@ class Parameter {
 }
 
 export default Parameter;
+export type { ParameterOptions };

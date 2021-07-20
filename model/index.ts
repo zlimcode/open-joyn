@@ -26,4 +26,4 @@ TypedJSON.mapType(THREE.Quaternion, {
 });
 
 
-export { Construction, Meta, Parameter, PartBase, Marker, Bar, Panel, Factory };
+export { Construction, Meta as Meta, Parameter as Parameter, PartBase, Marker, Bar, Panel, Factory };
