@@ -4,11 +4,10 @@ import type { vec2, vec3 } from "./PartBase";
 import Bar from "./Bar";
 import Panel from "./Panel";
 import Marker from "./Marker";
+import { closestPointOnSegmentToSegment, pairs } from "./helpers";
+
 
 import * as THREE from "three";
-
-
-import { closestPointOnSegmentToSegment, pairs } from "./helpers";
 
 
 let validateDefined = (v: any) => {
@@ -34,6 +33,11 @@ let validateTuple = (v: any, elementCount: number) => {
     }
 };
 
+/**
+ * Valid letters for an axis
+ */
+type Axis = "x" | "y" | "z" | "+x" | "+y" | "+z" | "-x" | "-y" | "-z";
+
 
 
 /**
@@ -47,8 +51,10 @@ interface PartOptions {
     /** Position of the origin as `[x, y, z]` */
     position?: vec3,
 
-    /** Alignment of the main axis of the part. */
-    axis?: "x" | "y" | "z",
+    /** Alignment of the main axis of the part.
+     * For your convenience: `["x", "y", "z"] = ["+x", "+y", "+z"]`
+     */
+    axis?: Axis,
 
     /** Draw the part highlighted in the preview */
     debug?: boolean;
@@ -56,25 +62,25 @@ interface PartOptions {
 
 
 /**
- * Options for creating bars with [[Factory.bar]]
+ * Options for creating Bars with [[Factory.bar]]
  * @category Factory
  */
 interface BarOptions extends PartOptions {
-    /** Total length of the bar */
+    /** Total length of the Bar. A negative length will have the Bar pointing in the opposite direction. */
     length?: number,
     /** Will ignore length and try to generate a Bar between [[position]] and [[to]] */
     to?: vec3;
-    /** `[width, height]` of the bar cross-section */
+    /** `[width, height]` of the Bar cross-section */
     size?: vec2;
 };
 
 
 /**
- * Options for creating panels with [[Factory.panel]]
+ * Options for creating Panels with [[Factory.panel]]
  * @category Factory
  */
 interface PanelOptions extends PartOptions {
-    /** Thickness of the panel */
+    /** Thickness of the panel. A negative thickness will have the Panel pointing in the opposite direction */
     thickness?: number,
 
     /** `[width, height]` of the panel */
@@ -83,13 +89,30 @@ interface PanelOptions extends PartOptions {
 
 
 /**
- * Options for creating markers with [[Factory.marker]]
+ * Options for creating Markers with [[Factory.marker]]
  * @see [[Factory.marker]]
  * @category Factory
  */
 interface MarkerOptions extends PartOptions {
     radius?: number,
 };
+
+
+function negateAxis(axis: Axis): Axis {
+    if (axis.length == 1) {
+        return ("-" + axis) as Axis;
+    }
+
+    if (axis.startsWith("+")) {
+        return ("-" + axis[1]) as Axis;
+    }
+
+    if (axis.startsWith("-")) {
+        return ("+" + axis[1]) as Axis;
+    }
+
+    return axis;
+}
 
 /**
  * A convenience construction factory, mainly used by the user API.
@@ -109,12 +132,18 @@ class Factory {
     private defaults = {
         bar: {
             size: [40, 40],
-            length: 100
+            length: 100,
+            axis: "z"
         } as BarOptions,
         panel: {
             size: [100, 100],
-            thickness: 12
+            thickness: 12,
+            axis: "z"
         } as PanelOptions,
+        marker: {
+            radius: 10.0,
+            axis: "z"
+        } as MarkerOptions
     };
 
     // group = "default";
@@ -209,14 +238,25 @@ class Factory {
      * @param options options that define the marker
      */
     marker(options: MarkerOptions) {
-        let defaultRadius = 10;  // TODO: somewhere
+        let opts = { ...this.defaults.marker, ...options };
 
-        let marker = new Marker(options.radius ?? defaultRadius);
+        let marker = new Marker(opts.radius);
 
-        this.finalizeAndAddPart(marker, options);
+        this.finalizeAndAddPart(marker, opts);
         return marker;
     }
 
+    /**
+     * Set default options for all Markers created after this.
+     * Setting the same option when calling `marker()` will overwrite this option.
+     * @param options options to apply to defaults
+     * @returns the currently set defaults
+     * @category Building
+     */
+    defaultsMarker(options: MarkerOptions) {
+        this.defaults.marker = { ...this.defaults.marker, ...options };
+        return this.defaults.marker;
+    }
 
     /**
      * Set default options for all Bars created after this.
@@ -252,8 +292,14 @@ class Factory {
     panel(options: PanelOptions) {
         let opts = { ...this.defaults.panel, ...options };
 
-        let panel = new Panel(opts.thickness, opts.size);
-        this.finalizeAndAddPart(panel, options);
+        if (opts.thickness < 0.0) {
+            opts.axis = negateAxis(opts.axis);
+        }
+
+        let thickness = Math.abs(opts.thickness);
+
+        let panel = new Panel(thickness, opts.size);
+        this.finalizeAndAddPart(panel, opts);
         return panel;
     }
 
@@ -270,11 +316,17 @@ class Factory {
      */
     bar(options: BarOptions) {
         let opts = { ...this.defaults.bar, ...options };
-        let bar = new Bar(opts.length, opts.size);
+
+        if (opts.length < 0.0) {
+            opts.axis = negateAxis(opts.axis);
+        }
+
+        let length = Math.abs(opts.length);
+        let bar = new Bar(length, opts.size);
 
         if (opts.to) {
             let pos = opts.position ?? [0, 0, 0];
-            bar = Bar.betweenTwoPoints(pos, options.to, opts.size);
+            bar = Bar.betweenTwoPoints(pos, opts.to, opts.size);
         }
 
         this.finalizeAndAddPart(bar, opts);
@@ -325,11 +377,11 @@ class Factory {
     fritten() {
         let nR = () => Math.random() * 2 - 1;
         let count = 5 + Math.random() * 5;
-        for (let i =0; i < count; i++) {
+        for (let i = 0; i < count; i++) {
             let posLower: vec3 = [nR() * 40, nR() * 40, 0];
             let posUpper: vec3 = [nR() * 400, nR() * 400, 1000];
 
-            this.bar({position: posLower, to: posUpper});
+            this.bar({ position: posLower, to: posUpper });
         }
     }
 
@@ -392,15 +444,31 @@ class Factory {
 
         switch (axis.toLocaleLowerCase()) {
             case "x":
+            case "+x":
                 part.rot.setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI * 0.5);
                 break;
 
             case "y":
+            case "+y":
                 part.rot.setFromAxisAngle(new THREE.Vector3(-1, 0, 0), Math.PI * 0.5);
                 break;
 
             case "z":
+            case "+z":
                 break;
+
+            case "-x":
+                part.rot.setFromAxisAngle(new THREE.Vector3(0, 1, 0), -Math.PI * 0.5);
+                break;
+
+            case "-y":
+                part.rot.setFromAxisAngle(new THREE.Vector3(-1, 0, 0), -Math.PI * 0.5);
+                break;
+
+            case "-z":
+                part.rot.setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI);
+                break;
+
 
             default:
                 throw new Error(`Unkown axis ${axis}`);
@@ -417,9 +485,7 @@ class Factory {
 
         this.construction.addPart(part, this.groupName);
     }
-
 }
 
-
 export default Factory;
-export type { Factory, BarOptions, PanelOptions, MarkerOptions };
+export type { Factory, BarOptions, PanelOptions, MarkerOptions, Axis };

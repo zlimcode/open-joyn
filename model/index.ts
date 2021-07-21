@@ -10,7 +10,10 @@ import Marker from "./Marker";
 
 import Factory from "./Factory";
 
+import type { vec2, vec3 } from "./PartBase";
+
 import { TypedJSON } from "typedjson";
+
 import * as THREE from "three";
 
 
@@ -26,4 +29,6 @@ TypedJSON.mapType(THREE.Quaternion, {
 });
 
 
-export { Construction, Meta as Meta, Parameter as Parameter, PartBase, Marker, Bar, Panel, Factory };
+export { Construction, Meta, Parameter, PartBase, Marker, Bar, Panel, Factory };
+export {log, map, mapConstrain, constrain} from "./helpers";
+export type { vec2, vec3 };

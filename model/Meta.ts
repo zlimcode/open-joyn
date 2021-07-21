@@ -50,9 +50,8 @@ class Meta implements MetaOptions {
     @jsonArrayMember(String)
     groupOrder: string[] = [];
 
-    @jsonArrayMember(String)
+    @jsonMember(String)
     style: string = "default";
-
 
     constructor(p: Partial<Meta>) {
         Object.assign(this, p);
