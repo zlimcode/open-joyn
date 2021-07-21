@@ -13,7 +13,8 @@ import type { MetaOptions } from "./Meta";
 import type { ParameterOptions } from "./Parameter";
 
 import Factory from "./Factory";
-import type { BarOptions, PanelOptions, MarkerOptions } from "./Factory";
+import type { Axis, BarOptions, PanelOptions, MarkerOptions } from "./Factory";
 
 export { PartBase, Bar, Panel, Marker, Factory };
-export type { vec2, vec3, MetaOptions, ParameterOptions, BarOptions, PanelOptions, MarkerOptions };
+export {log, map, mapConstrain, constrain } from "./helpers";
+export type { vec2, vec3, Axis, MetaOptions, ParameterOptions, BarOptions, PanelOptions, MarkerOptions };

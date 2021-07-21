@@ -28,6 +28,10 @@ class Construction {
         return this.parts.filter((p) => p instanceof Bar) as Bar[];
     }
 
+    get panels() {
+        return this.parts.filter((p) => p instanceof Panel) as Panel[];
+    }
+
     addPart(part: PartBase, group?: string) {
         this.parts.push(part);
         // TODO: implement groups
