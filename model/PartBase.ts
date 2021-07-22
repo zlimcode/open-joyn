@@ -1,5 +1,3 @@
-// import "reflect-metadata";
-
 import * as THREE from "three";
 
 import { jsonMember, jsonObject } from "typedjson";
@@ -12,6 +10,9 @@ import { jsonMember, jsonObject } from "typedjson";
 abstract class PartBase {
     @jsonMember(String)
     public name: string = "";
+
+    @jsonMember(String)
+    public group: string = "";
 
     @jsonMember(THREE.Vector3)
     public pos: THREE.Vector3;

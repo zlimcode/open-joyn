@@ -1,5 +1,8 @@
 import { jsonObject, jsonMember, jsonArrayMember } from "typedjson";
+import type { ParameterOptions } from "./Parameter";
 import Parameter from "./Parameter";
+import type { StepOptions } from "./Step";
+import Step from "./Step";
 
 
 /**
@@ -17,14 +20,17 @@ interface MetaOptions {
     author?: string;
 
     /** Array of parameters as desribed in [[ParameterOptions]]. */
-    parameters: Parameter[];
+    parameters: ParameterOptions[];
 
-    /** Determines how to order the created groups. */
-    groupOrder?: string[];
+    /** Specifies the steps for assembly and their associated group */
+    steps?: StepOptions[];
 
     /** Name of the style referenced. Will be used for choice of materials and connections. */
     style?: string;
-}
+};
+
+
+
 
 
 
@@ -47,8 +53,8 @@ class Meta implements MetaOptions {
     @jsonArrayMember(Parameter)
     parameters: Parameter[] = [];
 
-    @jsonArrayMember(String)
-    groupOrder: string[] = [];
+    @jsonArrayMember(Step)
+    steps: Step[] = [];
 
     @jsonMember(String)
     style: string = "default";

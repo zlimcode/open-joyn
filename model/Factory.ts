@@ -10,26 +10,25 @@ import { closestPointOnSegmentToSegment, pairs } from "./helpers";
 import * as THREE from "three";
 
 
-let validateDefined = (v: any) => {
+let validateDefined = (name: string, v: any) => {
     if (v === undefined) {
         throw new Error("Parameter must be defined");
     }
 };
 
-let validatePosition3 = (v: any) => {
-    validateDefined(v);
-
-    validateTuple(v, 3);
+let validatePosition3 = (name: string, v: any) => {
+    validateDefined(name, v);
+    validateTuple(name, v, 3);
 };
 
 
-let validateNumber = (v: any) => {
+let validateNumber = (name: string, v: any) => {
 
 };
 
-let validateTuple = (v: any, elementCount: number) => {
+let validateTuple = (name: string, v: any, elementCount: number) => {
     if (v.length != elementCount) {
-        throw new Error("Parameter must have " + elementCount + " elements");
+        throw new Error("Argument must have " + elementCount + " elements");
     }
 };
 
@@ -72,6 +71,8 @@ interface BarOptions extends PartOptions {
     to?: vec3;
     /** `[width, height]` of the Bar cross-section */
     size?: vec2;
+    /** Extend the bar by `[atStart, atEnd]` */
+    extend?: vec2;
 };
 
 
@@ -127,7 +128,7 @@ class Factory {
     construction: Construction;
     private matrixStack: THREE.Matrix4[];
     private grid = [40, 40, 40];
-    private groupName = "";
+    private currentGroup = "default";
 
     private defaults = {
         bar: {
@@ -226,10 +227,9 @@ class Factory {
      * Create a new group (if it does not exist), otherwise use an existing group.
      * All created parts will be assigned to this group, until a new group is defined.
      * @param name name of the group
-     * @alpha Bla bla bla
      */
     group(name: string) {
-        this.groupName = name;
+        this.currentGroup = name;
     }
 
 
@@ -326,10 +326,18 @@ class Factory {
 
         if (opts.to) {
             let pos = opts.position ?? [0, 0, 0];
-            bar = Bar.betweenTwoPoints(pos, opts.to, opts.size);
+            let to = opts.to;
+
+            bar = Bar.betweenTwoPoints(pos, to, opts.size);
         }
 
         this.finalizeAndAddPart(bar, opts);
+
+        if (opts.extend) {
+            bar.length = bar.length + opts.extend[0] + opts.extend[1];
+            bar.pos.set(...bar.pointFromStart(-opts.extend[0]));
+        }
+
         return bar;
     }
 
@@ -344,7 +352,6 @@ class Factory {
         options.axis = "x";
         return this.bar(options);
     }
-
 
     /**
      * Make a [[Bar]] aligned to the **y**-axis 
@@ -390,7 +397,7 @@ class Factory {
      * @category Connecting
      */
     joinAll() {
-        this.join(this.construction.bars);
+        this.join(this.construction.bars());
     }
 
     /**
@@ -469,11 +476,9 @@ class Factory {
                 part.rot.setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI);
                 break;
 
-
             default:
                 throw new Error(`Unkown axis ${axis}`);
         }
-
 
         // TODO: take rotation of global matrix into account
 
@@ -482,8 +487,9 @@ class Factory {
         let transPos = new THREE.Vector3(...pos);
         transPos.applyMatrix4(this.currentMatrix());
         part.pos = transPos;
+        part.group = this.currentGroup;
 
-        this.construction.addPart(part, this.groupName);
+        this.construction.addPart(part);
     }
 }
 
