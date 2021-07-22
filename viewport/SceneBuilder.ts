@@ -37,7 +37,7 @@ class SceneBuilder {
         const mat = new THREE.MeshStandardMaterial({
             // flatShading: true,
             color: 0x000000,
-            emissive: 0x0000ff
+            emissive: marker.color ?? 0x0000ff
         });
 
         const mesh = new THREE.Mesh(geo, mat);

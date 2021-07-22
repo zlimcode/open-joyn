@@ -95,7 +95,11 @@ interface PanelOptions extends PartOptions {
  * @category Factory
  */
 interface MarkerOptions extends PartOptions {
+    /** Radius */
     radius?: number,
+
+    /** Color as hex number. e.g. `0xff00ff` */
+    color?: number
 };
 
 
@@ -240,7 +244,7 @@ class Factory {
     marker(options: MarkerOptions) {
         let opts = { ...this.defaults.marker, ...options };
 
-        let marker = new Marker(opts.radius);
+        let marker = new Marker(opts.radius, opts.color);
 
         this.finalizeAndAddPart(marker, opts);
         return marker;
