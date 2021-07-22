@@ -71,15 +71,15 @@ class SceneBuilder {
         obj.add(mesh);
 
         if (bar.debug) {
-
             let lineX = makeDebugLine(new THREE.Vector3(bar.size[0] * 0.5, 0, 0), new THREE.Vector3(bar.size[0] * 0.5, 0, bar.length), "#ff0000");
             let lineY = makeDebugLine(new THREE.Vector3(0, bar.size[1] * 0.5, 0), new THREE.Vector3(0, bar.size[1] * 0.5, bar.length), "#00ff00");
             obj.add(lineX);
             obj.add(lineY);
 
             mat.transparent = true;
-            mat.opacity = 0.5;
+            mat.opacity = 0.25;
             mat.color = debugColor;
+            mat.side = THREE.DoubleSide;
         }
 
         applyPartPosRotToObj(bar, obj);
@@ -124,7 +124,10 @@ class SceneBuilder {
         obj.add(mesh);
 
         if (panel.debug) {
+            mat.transparent = true;
+            mat.opacity = 0.25;
             mat.color = debugColor;
+            mat.side = THREE.DoubleSide;
         }
 
         applyPartPosRotToObj(panel, obj);
