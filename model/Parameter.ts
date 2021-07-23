@@ -39,7 +39,12 @@ interface ParameterOptions {
 
     /** Unit to display. */
     unit?: string;
+
+    /** Classes for styling. */
+    class?: string;
 }
+
+
 
 /**
  * Parameter options
@@ -70,6 +75,9 @@ class Parameter implements ParameterOptions {
 
     @jsonMember(String)
     unit?: string;
+
+    @jsonMember(String)
+    class?: string
 
     constructor(p: ParameterOptions) {
         Object.assign(this, p);
