@@ -7,7 +7,6 @@ const bevelDefault = 2;
 const debugColor = new THREE.Color(0xff4500);
 
 
-
 function applyPartPosRotToObj(part: PartBase, obj: THREE.Object3D) {
     obj.position.copy(part.pos);
     obj.quaternion.copy(part.rot);
@@ -26,9 +25,46 @@ function makeDebugLine(from: THREE.Vector3, to: THREE.Vector3, color?: string) {
 
 class SceneBuilder {
     construction: Construction;
+    barStandardMaterial: THREE.Material;
+    barDebugMaterial: THREE.Material;
+
+    panelStandardMaterial: THREE.Material;
+    panelDebugMaterial: THREE.Material;
 
     constructor(construction: Construction) {
         this.construction = construction;
+
+        this.barStandardMaterial = new THREE.MeshStandardMaterial(
+            {
+                color: 0xe6d488,
+            });
+
+
+        this.barDebugMaterial = new THREE.MeshStandardMaterial(
+            {
+                color: debugColor,
+                opacity: 0.25,
+                transparent: true,
+                side: THREE.DoubleSide
+
+            });
+
+
+        this.panelStandardMaterial = new THREE.MeshStandardMaterial(
+            {
+                roughness: 0.25,
+                color: 0x222222,
+            });
+
+
+        this.panelDebugMaterial = new THREE.MeshStandardMaterial(
+            {
+                color: debugColor,
+                opacity: 0.25,
+                transparent: true,
+                side: THREE.DoubleSide
+
+            });
     }
 
     makeMarkerObj(marker: Marker): THREE.Object3D {
@@ -55,15 +91,9 @@ class SceneBuilder {
     makeBarObj(bar: Bar): THREE.Object3D {
         const geo = makeBevelBoxGeometry(bar.size, bar.length, bevelDefault);
 
+        let mat = bar.debug ? this.barDebugMaterial : this.barStandardMaterial;
 
-        let mat = new THREE.MeshStandardMaterial(
-            {
-                color: 0xe6d488,
-            }
-        );
-
-
-        const mesh = new THREE.Mesh(geo, mat);
+        const mesh = new THREE.Mesh(geo, this.barStandardMaterial);
         mesh.position.set(0, 0, bar.length * 0.5);
         // mesh.castShadow = true;
 
@@ -75,11 +105,6 @@ class SceneBuilder {
             let lineY = makeDebugLine(new THREE.Vector3(0, bar.size[1] * 0.5, 0), new THREE.Vector3(0, bar.size[1] * 0.5, bar.length), "#00ff00");
             obj.add(lineX);
             obj.add(lineY);
-
-            mat.transparent = true;
-            mat.opacity = 0.25;
-            mat.color = debugColor;
-            mat.side = THREE.DoubleSide;
         }
 
         applyPartPosRotToObj(bar, obj);
@@ -101,7 +126,7 @@ class SceneBuilder {
         // w0.add(lineSide2);
         // w0.add(lineSide3);
 
-        //w0.add(obj);
+        // w0.add(obj);
 
 
         return obj;
@@ -109,13 +134,8 @@ class SceneBuilder {
 
     makePanelObj(panel: Panel): THREE.Object3D {
         const geo = makeBevelBoxGeometry(panel.size, panel.thickness, bevelDefault, bevelDefault);
-        let mat = new THREE.MeshStandardMaterial(
-            {
-                roughness: 0.25,
-                color: 0x222222,
-            }
-        );
-
+        let mat = panel.debug ? this.panelDebugMaterial : this.panelStandardMaterial;
+        
         const mesh = new THREE.Mesh(geo, mat);
         mesh.position.set(0, 0, panel.thickness * 0.5);
         mesh.castShadow = true;
@@ -123,19 +143,12 @@ class SceneBuilder {
         const obj = new THREE.Object3D();
         obj.add(mesh);
 
-        if (panel.debug) {
-            mat.transparent = true;
-            mat.opacity = 0.25;
-            mat.color = debugColor;
-            mat.side = THREE.DoubleSide;
-        }
-
         applyPartPosRotToObj(panel, obj);
 
         return obj;
     }
 
-    makeSceneObj(part: PartBase): THREE.Object3D {
+    makeSceneObj(part: PartBase): THREE.Object3D | undefined {
         if (part instanceof Bar) {
             return this.makeBarObj(part);
         } else if (part instanceof Panel) {
@@ -145,8 +158,6 @@ class SceneBuilder {
         }
 
         console.warn("Unhandled part", part);
-
-        return null;
     }
 
     makeGroup(): THREE.Group {

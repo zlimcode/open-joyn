@@ -1,7 +1,3 @@
-
-
-
-import { space } from "svelte/internal";
 import * as THREE from "three";
 
 function makeBevelBoxGeometry(size: number[], length: number, bevelProfile: number, bevelRim?: number) {
@@ -10,15 +6,7 @@ function makeBevelBoxGeometry(size: number[], length: number, bevelProfile: numb
 
     const shape = new THREE.Shape();
 
-
-    // shape.moveTo(0, 0);
-    // shape.lineTo(w, 0);
-    // shape.lineTo(w, h);
-    // shape.lineTo(0, h);
-    // shape.lineTo(0, 0);
-
     let b = Math.min(bevelProfile, Math.min(w, h) * 0.5);
-
 
     shape.moveTo(0.0 + b, 0);
     shape.lineTo(w - b, 0);
@@ -31,8 +19,6 @@ function makeBevelBoxGeometry(size: number[], length: number, bevelProfile: numb
     shape.lineTo(0.0, 0.0 + b);
     shape.lineTo(0.0 + b, 0);
 
-
-
     let rimHasBevel = bevelRim !== undefined;
 
     let extrudeLength = length;
@@ -44,7 +30,7 @@ function makeBevelBoxGeometry(size: number[], length: number, bevelProfile: numb
     }
 
     const extrudeSettings = {
-        steps: 2,
+        steps: 1,
         depth: extrudeLength,
         bevelEnabled: rimHasBevel,
         bevelThickness: bevelRim,
