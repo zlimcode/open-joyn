@@ -174,6 +174,10 @@ class Factory {
         let currentMatrix = this.currentMatrix();
         let newMatrix = currentMatrix.clone();
         this.matrixStack.push(newMatrix);
+
+        if (this.matrixStack.length > 32) {
+            throw new Error("push() called too often. Is it possible that you forgot a pop()?")
+        }
     }
 
     /**
@@ -183,7 +187,10 @@ class Factory {
      * @category Transformation
      */
     pop() {
-        // TODO: check for empty (popped too often)
+        if (this.matrixStack.length == 1) {
+            throw new Error("pop() called too often. Is it possible that you forgot a push()?")
+        }
+
         this.matrixStack.pop();
     }
 
