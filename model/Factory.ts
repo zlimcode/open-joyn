@@ -1,10 +1,10 @@
 import Construction from "./Construction";
 import type PartBase from "./PartBase";
+
 import type { vec2, vec3 } from "./PartBase";
-import Bar from "./Bar";
 import Panel from "./Panel";
 import Marker from "./Marker";
-import { closestPointOnSegmentToSegment, pairs } from "./helpers";
+import Bar from "./Bar";
 
 
 import * as THREE from "three";
@@ -99,7 +99,7 @@ interface MarkerOptions extends PartOptions {
     radius?: number,
 
     /** Color as hex number. e.g. `0xff00ff` */
-    color?: number
+    color?: number;
 };
 
 
@@ -176,7 +176,7 @@ class Factory {
         this.matrixStack.push(newMatrix);
 
         if (this.matrixStack.length > 32) {
-            throw new Error("push() called too often. Is it possible that you forgot a pop()?")
+            throw new Error("push() called too often. Is it possible that you forgot a pop()?");
         }
     }
 
@@ -188,7 +188,7 @@ class Factory {
      */
     pop() {
         if (this.matrixStack.length == 1) {
-            throw new Error("pop() called too often. Is it possible that you forgot a push()?")
+            throw new Error("pop() called too often. Is it possible that you forgot a push()?");
         }
 
         this.matrixStack.pop();
@@ -417,30 +417,24 @@ class Factory {
      * @category Connecting
      */
     join(bars: Bar[]) {
-        const barPairs = pairs(bars);
+        const candidatePairs = Bar.findCandidatePairs(bars);
 
-        barPairs.forEach((barPair) => {
+        candidatePairs.forEach((barPair) => {
             const barA = barPair[0];
             const barB = barPair[1];
 
-            for (let i = 0; i < 4; i++) {
-                for (let j = 0; j < 4; j++) {
-                    const lineA = barA.lineOnSide(i);
-                    const lineB = barB.lineOnSide(j);
+            let buttA = Bar.findButtConnection(barA, barB);
 
-                    const pointA = new THREE.Vector3();
-                    const pointB = new THREE.Vector3();
+            if (buttA) {
+                this.marker({ position: buttA.toArray(), color: 0xff00ff });
+                return;
+            }
 
-                    // TODO: catch points outside segments
+            let buttB = Bar.findButtConnection(barB, barA);
 
-                    closestPointOnSegmentToSegment(lineA.start, lineA.end, lineB.start, lineB.end, pointA, pointB);
-
-                    let dist = pointA.distanceToSquared(pointB);
-                    if (dist < (0.1 * 0.1)) {   // TODO: to config
-                        this.marker({ radius: 5.0, position: pointA.toArray() });
-                        this.marker({ radius: 5.0, position: pointB.toArray() });
-                    }
-                }
+            if (buttB) {
+                this.marker({ position: buttB.toArray(), color: 0xff00ff });
+                return;
             }
 
         });
