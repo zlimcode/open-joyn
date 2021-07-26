@@ -4,9 +4,7 @@ import { closestPointsOnSegmentToSegment } from "./math";
 
 import { jsonObject, jsonMember, jsonArrayMember } from "typedjson";
 import * as THREE from "three";
-import { Vector3 } from "three";
 
-// type BarSide = 0 | 1 | 2 | 3;
 
 enum BarSide {
     N = 0,
@@ -24,7 +22,29 @@ const SideUnitNormals = [
 ];
 
 
-let Epsilon = 0.001; // TODO: move out epsilon
+type ConnectionResult = {
+    position: THREE.Vector3;
+
+    a: Bar,
+    b: Bar;
+
+    posA: number;
+    posB: number;
+};
+
+
+type ButtConnectionResult = ConnectionResult & {
+    atStart: boolean;
+    sideB: BarSide;
+};
+
+type OverlapConnectionResult = ConnectionResult & {
+    sideA: BarSide;
+    sideB: BarSide;
+};
+
+const Epsilon = 0.001; // TODO: move out epsilon
+const EpsilonSq = Epsilon * Epsilon;
 
 
 
@@ -223,35 +243,39 @@ class Bar extends PartBase {
      * @return the point where it happens (or undefined if no butt is found)  // TODO: return side!
      * @category Expert
      */
-    static findButtConnection(barA: Bar, barB: Bar): THREE.Vector3 | undefined {
-        const barACenterLine = barA.centerLine();
+    static findButtConnection(barA: Bar, barB: Bar): ButtConnectionResult | undefined {
+        const centerLineA = barA.centerLine();
 
-        const barADirection = barACenterLine.delta(new Vector3());
-        barADirection.normalize();
+        const dirA = centerLineA.delta(new THREE.Vector3());
+        dirA.normalize();
 
         // TODO: maybe abort earlier? No need to check all sides if the two bars are not perpendicular in general
 
-        for (let i = 0; i < 4; i++) {
-            const line = barB.lineOnSide(i);
-            const sideNormal = barB.sideNormal(i);
+        for (let sideB = 0; sideB < 4; sideB++) {
+            const sideLineB = barB.lineOnSide(sideB);
+            const sideNormalB = barB.sideNormal(sideB);
 
+            if (sideNormalB.manhattanDistanceTo(dirA) < Epsilon) { // start of A on this side?
+                let buttPoint = sideLineB.closestPointToPoint(centerLineA.start, true, new THREE.Vector3());
 
-            if (sideNormal.manhattanDistanceTo(barADirection) < Epsilon) { // start of A on this side
-                let buttPoint = line.closestPointToPoint(barACenterLine.start, true, new Vector3());
-
-                if (buttPoint.distanceToSquared(barACenterLine.start) < Epsilon) {
-                    return barACenterLine.start;
+                if (buttPoint.distanceToSquared(centerLineA.start) < EpsilonSq) {
+                    const barPosA = 0;
+                    const barPosB = sideLineB.start.distanceTo(centerLineA.start);
+                    return { position: centerLineA.start, atStart: true, posA: barPosA, a: barA, posB: barPosB, b: barB, sideB: sideB };
                 }
                 return undefined;
             }
 
-            sideNormal.multiplyScalar(-1);
+            sideNormalB.multiplyScalar(-1);
 
-            if (sideNormal.manhattanDistanceTo(barADirection) < Epsilon) { // end of A on this side
-                let buttPoint = line.closestPointToPoint(barACenterLine.end, true, new Vector3());
+            if (sideNormalB.manhattanDistanceTo(dirA) < Epsilon) { // end of A on this side?
+                let buttPoint = sideLineB.closestPointToPoint(centerLineA.end, true, new THREE.Vector3());
 
-                if (buttPoint.distanceToSquared(barACenterLine.end) < Epsilon) {
-                    return barACenterLine.end;
+                if (buttPoint.distanceToSquared(centerLineA.end) < EpsilonSq) {
+                    const barPosA = barA.length;
+                    const barPosB = sideLineB.start.distanceTo(centerLineA.end);
+
+                    return { position: centerLineA.end, atStart: false, posA: barPosA, a: barA, posB: barPosB, b: barB, sideB: sideB };
                 }
                 return undefined;
             }
@@ -260,21 +284,30 @@ class Bar extends PartBase {
         return undefined;
     }
 
-    static findOverlapConnection(barA: Bar, barB: Bar) {
-        for (let i = 0; i < 4; i++) {
-            for (let j = 0; j < 4; j++) {
-                const lineA = barA.lineOnSide(i);
-                const lineB = barB.lineOnSide(j);
+    static findOverlapConnection(barA: Bar, barB: Bar): OverlapConnectionResult | undefined {
+        for (let sideA = 0; sideA < 4; sideA++) {
+            const lineA = barA.lineOnSide(sideA);
+            const invNormalA = barA.sideNormal(sideA);
+            invNormalA.multiplyScalar(-1);
 
-                // TODO: catch points outside segments
+            for (let sideB = 0; sideB < 4; sideB++) {
+                const normalB = barB.sideNormal(sideB);
+
+                if (invNormalA.manhattanDistanceTo(normalB) > Epsilon) {        // Sides are not facing each other
+                    continue;
+                }
+
+                const lineB = barB.lineOnSide(sideB);
 
                 let result = closestPointsOnSegmentToSegment(lineA.start, lineA.end, lineB.start, lineB.end);
 
                 let [pointA, pointB] = result;
-                let dist = pointA.distanceToSquared(pointB);
-                if (dist < (0.1 * 0.1)) {   // TODO: to config
-                    // this.marker({ radius: 5.0, color: 0x00ff00, position: pointA.toArray() });
-                    // this.marker({ radius:  5.0, color: 0xff0000, position: pointB.toArray() });
+
+                if (result && pointA.distanceToSquared(pointB) < EpsilonSq) {
+                    const posA = pointA.distanceTo(lineA.start);
+                    const posB = pointB.distanceTo(lineB.start);
+
+                    return { position: pointA, a: barA, b: barB, sideA: sideA, sideB: sideB, posA: posA, posB: posB };
                 }
             }
         }
@@ -285,3 +318,5 @@ class Bar extends PartBase {
 
 
 export default Bar;
+export { BarSide };
+export type { OverlapConnectionResult, ButtConnectionResult };

@@ -421,6 +421,11 @@ class Factory {
      */
     join(bars: Bar[]) {
         const candidatePairs = Bar.findCandidatePairs(bars);
+        // candidatePairs.sort(() => (Math.random() > .5) ? 1 : -1);
+
+
+        let overlaps: OverlapConnectionResult[] = [];
+        let butts: ButtConnectionResult[] = [];
 
         candidatePairs.forEach((barPair) => {
             const barA = barPair[0];
@@ -429,18 +434,111 @@ class Factory {
             let buttA = Bar.findButtConnection(barA, barB);
 
             if (buttA) {
-                this.marker({ position: buttA.toArray(), color: 0xff00ff });
+                // this.marker({ position: buttA.position.toArray(), radius: 5, color: 0xff00ff });
+                butts.push(buttA);
                 return;
             }
 
             let buttB = Bar.findButtConnection(barB, barA);
 
             if (buttB) {
-                this.marker({ position: buttB.toArray(), color: 0xff00ff });
+                // this.marker({ position: buttB.position.toArray(), radius: 5, color: 0xff00ff });
+                butts.push(buttB);
                 return;
             }
 
+            let overlap = Bar.findOverlapConnection(barA, barB);
+
+            if (overlap) {
+                // this.marker({ position: overlap.position.toArray(), radius: 5, color: 0x00ffff });
+                overlaps.push(overlap);
+                return;
+            }
         });
+
+
+        let isOtherSide = (sideA: number, sideB: number): boolean => {
+            return ((sideA + 2) % 4) == sideB;
+
+            // return true;
+        };
+
+
+        let isConnectedThrough = (sideA: number, posA: number, sideB: number, posB: number): boolean => {
+            return (isOtherSide(sideA, sideB) && Math.abs(posA - posB) < 0.001); // TODO: use epsilon
+        };
+
+        // TODO: factor out
+        // TODO: find out why this works when kept sorted, fails otherwise...
+
+        //overlaps.sort(() => (Math.random() > .5) ? 1 : -1);
+        //overlaps.reverse();
+
+
+        let situations = overlaps.reduce((situations, conn) => {
+            let matched = false;
+
+            for (let situation of situations) {
+                let left = situation[0];
+                let right = situation[situation.length - 1];
+
+                if (conn.a == left.a && isConnectedThrough(conn.sideA, conn.posA, left.sideA, left.posA)) {
+                    let newC = { position: conn.position, a: conn.b, b: conn.a, posA: conn.posB, posB: conn.posA, sideA: conn.sideB, sideB: conn.sideA };
+                    situation.unshift(newC);
+                    matched = true;
+                } else if (conn.b == left.a && isConnectedThrough(conn.sideB, conn.posB, left.sideA, left.posA)) {
+                    situation.unshift(conn);
+                    matched = true;
+                } else if (conn.a == right.b && isConnectedThrough(conn.sideA, conn.posA, right.sideB, right.posB)) {
+                    situation.push(conn);
+                    matched = true;
+                } else if (conn.b == right.b && isConnectedThrough(conn.sideB, conn.posB, right.sideB, right.posB)) {
+                    let newC = { position: conn.position, a: conn.b, b: conn.a, posA: conn.posB, posB: conn.posA, sideA: conn.sideB, sideB: conn.sideA };
+                    situation.push(newC);
+                    matched = true;
+                }
+
+                if (matched) {
+                    break;
+                }
+            }
+
+            if (!matched) {
+                situations.push([conn]);
+            }
+
+            return situations;
+        }, [] as OverlapConnectionResult[][]);
+
+
+        // situations = [];
+
+        // for (let overlap of overlaps) {
+        //     situations.push([overlap]);
+        // }
+
+
+        for (let situation of situations) {
+            let first = situation[0];
+            let last = situation[situation.length - 1];
+
+            let lineFirst = first.a.lineOnSide((first.sideA + 2) % 4);
+            let posFirst = lineFirst.start.clone().lerp(lineFirst.end, first.posA / first.a.length);
+
+            let lineLast = last.b.lineOnSide((last.sideB + 2) % 4);
+            let posLast = lineLast.start.clone().lerp(lineLast.end, last.posB / last.b.length);
+
+            let delta = posLast.clone().sub(posFirst);
+            let length = delta.length() - 10;
+
+            let connector = new Connector(length);
+            this.finalizeAndAddPart(connector, { position: posFirst.toArray() });
+            connector.rot.setFromUnitVectors(new THREE.Vector3(0, 0, 1), delta.normalize());
+        }
+
+        // console.log(situations);
+
+        // console.log(this.construction.markers().length);  // TODO: remove
     }
 
     private finalizeAndAddPart(part: PartBase, options: PartOptions) {
