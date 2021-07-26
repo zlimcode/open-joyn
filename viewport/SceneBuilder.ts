@@ -1,4 +1,4 @@
-import { Bar, Panel, Construction, PartBase, Marker } from "openjoyn/model";
+import { Bar, Panel, Construction, Connector, PartBase, Marker } from "openjoyn/model";
 import { makeBevelBoxGeometry } from "./helpers";
 
 import * as THREE from "three";
@@ -28,6 +28,10 @@ class SceneBuilder {
     barStandardMaterial: THREE.Material;
     barDebugMaterial: THREE.Material;
 
+    connectorStandardMaterial: THREE.Material;
+    connectorDebugMaterial: THREE.Material;
+
+
     panelStandardMaterial: THREE.Material;
     panelDebugMaterial: THREE.Material;
 
@@ -37,6 +41,9 @@ class SceneBuilder {
         this.barStandardMaterial = new THREE.MeshStandardMaterial(
             {
                 color: 0xe6d488,
+                // polygonOffset: true,
+                // polygonOffsetUnits: 1,
+                // polygonOffsetFactor: 1
             });
 
 
@@ -65,13 +72,29 @@ class SceneBuilder {
                 side: THREE.DoubleSide
 
             });
+
+
+        this.connectorStandardMaterial = new THREE.MeshStandardMaterial(
+            {
+                roughness: 0.25,
+                color: 0xff00ff,
+            });
+
+
+        this.connectorDebugMaterial = new THREE.MeshStandardMaterial(
+            {
+                color: debugColor,
+                opacity: 0.25,
+                transparent: true,
+                side: THREE.DoubleSide
+
+            });
     }
 
     makeMarkerObj(marker: Marker): THREE.Object3D {
-        const geo = new THREE.SphereGeometry(marker.radius, 16, 12);
+        const geo = new THREE.SphereGeometry(marker.radius, 8, 6);
 
         const mat = new THREE.MeshStandardMaterial({
-            // flatShading: true,
             color: 0x000000,
             emissive: marker.color ?? 0x0000ff
         });
@@ -93,7 +116,7 @@ class SceneBuilder {
 
         let mat = bar.debug ? this.barDebugMaterial : this.barStandardMaterial;
 
-        const mesh = new THREE.Mesh(geo, this.barStandardMaterial);
+        const mesh = new THREE.Mesh(geo, mat);
         mesh.position.set(0, 0, bar.length * 0.5);
         // mesh.castShadow = true;
 
@@ -106,6 +129,19 @@ class SceneBuilder {
             obj.add(lineX);
             obj.add(lineY);
         }
+
+        // const edges = new THREE.EdgesGeometry(geo);
+
+        // const lineMat2 = new THREE.LineBasicMaterial({
+        //     linewidth: 5, // in pixels
+        //     color: 0x000000,
+        // });
+        // const line = new THREE.LineSegments(edges, lineMat2);
+        // line.position.copy(mesh.position);
+
+        // line.computeLineDistances();
+        // obj.add(line);
+
 
         applyPartPosRotToObj(bar, obj);
 
@@ -135,7 +171,7 @@ class SceneBuilder {
     makePanelObj(panel: Panel): THREE.Object3D {
         const geo = makeBevelBoxGeometry(panel.size, panel.thickness, bevelDefault, bevelDefault);
         let mat = panel.debug ? this.panelDebugMaterial : this.panelStandardMaterial;
-        
+
         const mesh = new THREE.Mesh(geo, mat);
         mesh.position.set(0, 0, panel.thickness * 0.5);
         mesh.castShadow = true;
@@ -148,6 +184,29 @@ class SceneBuilder {
         return obj;
     }
 
+
+
+    makeConnectorObj(connector: Connector): THREE.Object3D {
+        let mat = connector.debug ? this.connectorDebugMaterial : this.connectorStandardMaterial;
+
+        let cylinderGeo = new THREE.CylinderGeometry(2, 2, connector.length);
+        const cylinderMesh = new THREE.Mesh(cylinderGeo, mat);
+        cylinderMesh.rotateX(Math.PI * 0.5);
+        cylinderMesh.position.set(0, 0, connector.length * 0.5);
+        cylinderMesh.castShadow = true;
+
+        const sphereGeo = new THREE.SphereGeometry(6, 8, 6);
+        const sphereMesh = new THREE.Mesh(sphereGeo, mat);
+
+        const obj = new THREE.Object3D();
+        obj.add(cylinderMesh);
+        obj.add(sphereMesh);
+
+        applyPartPosRotToObj(connector, obj);
+
+        return obj;
+    }
+
     makeSceneObj(part: PartBase): THREE.Object3D | undefined {
         if (part instanceof Bar) {
             return this.makeBarObj(part);
@@ -155,6 +214,8 @@ class SceneBuilder {
             return this.makePanelObj(part);
         } else if (part instanceof Marker) {
             return this.makeMarkerObj(part);
+        }  else if (part instanceof Connector) {
+            return this.makeConnectorObj(part);
         }
 
         console.warn("Unhandled part", part);
