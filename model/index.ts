@@ -8,6 +8,7 @@ import Step from "./Step";
 import Bar from "./Bar";
 import Panel from "./Panel";
 import Marker from "./Marker";
+import Connector from "./Connector";
 
 import Factory from "./Factory";
 
@@ -30,6 +31,6 @@ TypedJSON.mapType(THREE.Quaternion, {
 });
 
 
-export { Construction, Meta, Parameter, PartBase, Marker, Bar, Panel, Factory, Step };
+export { Construction, Meta, Parameter, PartBase, Connector, Marker, Bar, Panel, Factory, Step };
 export {log, map, mapConstrain, constrain} from "./helpers";
 export type { vec2, vec3 };
