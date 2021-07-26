@@ -3,15 +3,15 @@ import { Construction, Meta } from "openjoyn/model";
 import { ExecutionError } from "./Error";
 
 class Executor {
-    onError = (error: ExecutionError) => {
+    onError = (_error: ExecutionError) => {
         console.warn("onError not bound");
     };
 
-    onMeta = (meta: Meta) => {
+    onMeta = (_meta: Meta) => {
         console.warn("onMeta not bound");
     };
 
-    onResult = (construction: Construction) => {
+    onResult = (_construction: Construction) => {
         console.warn("onResult not bound");
     };
 
@@ -25,26 +25,41 @@ class Executor {
         this.sendMessage({ cmd: "commit", code: userCode });
     }
 
-    generate(values: any) {
+    generate(values: object) {
         this.sendMessage({ cmd: "generate", values: values });
     }
 
     private handleMetaMessage(metaJson: object) {
         let serde = new TypedJSON(Meta);
         let meta = serde.parse(metaJson);
-        this.onMeta(meta);
+
+        if (meta) {
+            this.onMeta(meta);
+        } else {
+            console.error("Meta message is undefined");
+        }
     }
 
     private handleResultMessage(resultJson: object) {
         let serde = new TypedJSON(Construction);
         let construction = serde.parse(resultJson);
-        this.onResult(construction);
+
+        if (construction) {
+            this.onResult(construction);
+        } else {
+            console.error("Construction message is undefined");
+        }
     }
 
     private handleErrorMessage(erorrJson: object) {
         let serde = new TypedJSON(ExecutionError);
         let error = serde.parse(erorrJson);
-        this.onError(error);
+
+        if (error) {
+            this.onError(error);
+        } else {
+            console.error("Error message is undefined");
+        }
     }
 
 

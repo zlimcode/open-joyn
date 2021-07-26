@@ -20,7 +20,7 @@ interface ParameterOptions {
     name: string;
 
     /** Default value. Also determines type. */
-    value: any;
+    value: number | boolean | string;
 
     /** Label to display in the UI. */
     label?: string;
@@ -111,7 +111,11 @@ class Parameter implements ParameterOptions {
         return this.options;
     }
 
-    normalizedOptions(): [any, any][] {
+    normalizedOptions(): [any, any][] | undefined {
+        if (!this.options) {
+            return undefined;
+        }
+
         let out = this.options.map((o) => {
             if (Array.isArray(o)) {
                 return o;

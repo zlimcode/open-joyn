@@ -6,31 +6,34 @@ import Panel from "./Panel";
 import Marker from "./Marker";
 import Bar from "./Bar";
 
+import type { OverlapConnectionResult, ButtConnectionResult } from "./Bar";
+
 
 import * as THREE from "three";
+import Connector from "./Connector";
 
 
-let validateDefined = (name: string, v: any) => {
-    if (v === undefined) {
-        throw new Error("Parameter must be defined");
-    }
-};
+// let validateDefined = (name: string, v: any) => {
+//     if (v === undefined) {
+//         throw new Error("Parameter must be defined");
+//     }
+// };
 
-let validatePosition3 = (name: string, v: any) => {
-    validateDefined(name, v);
-    validateTuple(name, v, 3);
-};
+// let validatePosition3 = (name: string, v: any) => {
+//     validateDefined(name, v);
+//     validateTuple(name, v, 3);
+// };
 
 
-let validateNumber = (name: string, v: any) => {
+// let validateNumber = (_name: string, v: any) => {
 
-};
+// };
 
-let validateTuple = (name: string, v: any, elementCount: number) => {
-    if (v.length != elementCount) {
-        throw new Error("Argument must have " + elementCount + " elements");
-    }
-};
+// let validateTuple = (name: string, v: any, elementCount: number) => {
+//     if (v.length != elementCount) {
+//         throw new Error("Argument must have " + elementCount + " elements");
+//     }
+// };
 
 /**
  * Valid letters for an axis
@@ -251,7 +254,7 @@ class Factory {
     marker(options: MarkerOptions) {
         let opts = { ...this.defaults.marker, ...options };
 
-        let marker = new Marker(opts.radius, opts.color);
+        let marker = new Marker(opts.radius!, opts.color);
 
         this.finalizeAndAddPart(marker, opts);
         return marker;
@@ -303,13 +306,13 @@ class Factory {
     panel(options: PanelOptions) {
         let opts = { ...this.defaults.panel, ...options };
 
-        if (opts.thickness < 0.0) {
-            opts.axis = negateAxis(opts.axis);
+        if (opts.thickness! < 0.0) {
+            opts.axis = negateAxis(opts.axis!);
         }
 
-        let thickness = Math.abs(opts.thickness);
+        let thickness = Math.abs(opts.thickness!);
 
-        let panel = new Panel(thickness, opts.size);
+        let panel = new Panel(thickness, opts.size!);
         this.finalizeAndAddPart(panel, opts);
         return panel;
     }
@@ -328,18 +331,18 @@ class Factory {
     bar(options: BarOptions) {
         let opts = { ...this.defaults.bar, ...options };
 
-        if (opts.length < 0.0) {
-            opts.axis = negateAxis(opts.axis);
+        if (opts.length! < 0.0) {
+            opts.axis = negateAxis(opts.axis!);
         }
 
-        let length = Math.abs(opts.length);
-        let bar = new Bar(length, opts.size);
+        let length = Math.abs(opts.length!);
+        let bar = new Bar(length, opts.size!);
 
         if (opts.to) {
             let pos = opts.position ?? [0, 0, 0];
             let to = opts.to;
 
-            bar = Bar.betweenTwoPoints(pos, to, opts.size);
+            bar = Bar.betweenTwoPoints(pos, to, opts.size!);
         }
 
         this.finalizeAndAddPart(bar, opts);

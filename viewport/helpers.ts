@@ -19,12 +19,13 @@ function makeBevelBoxGeometry(size: number[], length: number, bevelProfile: numb
     shape.lineTo(0.0, 0.0 + b);
     shape.lineTo(0.0 + b, 0);
 
-    let rimHasBevel = bevelRim !== undefined;
-
     let extrudeLength = length;
 
-    if (rimHasBevel) {
+
+    let bevelEnabled = false;
+    if (bevelRim) {
         extrudeLength = Math.max(0, extrudeLength - bevelRim * 2.0);
+        bevelEnabled = true;
     } else {
         bevelRim = 0.0;
     }
@@ -32,7 +33,7 @@ function makeBevelBoxGeometry(size: number[], length: number, bevelProfile: numb
     const extrudeSettings = {
         steps: 1,
         depth: extrudeLength,
-        bevelEnabled: rimHasBevel,
+        bevelEnabled: bevelEnabled,
         bevelThickness: bevelRim,
         bevelSize: bevelRim,
         bevelOffset: -bevelRim,
