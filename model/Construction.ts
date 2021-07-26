@@ -1,5 +1,5 @@
 import PartBase from "./PartBase";
-import Connector from "./Connector";
+import { ButtConnector, Connector, OverlapConnector } from "./Connector";
 import Bar from "./Bar";
 import Panel from "./Panel";
 import Marker from "./Marker";
@@ -7,7 +7,7 @@ import Marker from "./Marker";
 import { jsonObject, jsonMember, jsonArrayMember } from "typedjson";
 
 
-const PartsTypes = [Bar, Panel, Marker, Connector];
+const PartsTypes = [Bar, Panel, Marker, Connector, ButtConnector, OverlapConnector];
 
 
 function partGroupsFromKeys<T extends PartBase>(groups: string[], arr: T[]) {

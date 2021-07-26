@@ -114,6 +114,16 @@ class Bar extends PartBase {
         return this.pointFromEnd(0);
     }
 
+
+    sizeMin(): number {
+        return Math.min(this.size[0], this.size[1]);
+    }
+
+
+    sizeMax(): number {
+        return Math.max(this.size[0], this.size[1]);
+    }
+
     /**
      * @ignore
      * Compute axis-aligned bounding box with the maximum size added to each side.
@@ -261,9 +271,9 @@ class Bar extends PartBase {
                 if (buttPoint.distanceToSquared(centerLineA.start) < EpsilonSq) {
                     const barPosA = 0;
                     const barPosB = sideLineB.start.distanceTo(centerLineA.start);
-                    return { position: centerLineA.start, atStart: true, posA: barPosA, a: barA, posB: barPosB, b: barB, sideB: sideB };
+                    let butt = { position: centerLineA.start, atStart: true, posA: barPosA, a: barA, posB: barPosB, b: barB, sideB: sideB };
+                    return butt;
                 }
-                return undefined;
             }
 
             sideNormalB.multiplyScalar(-1);
@@ -275,9 +285,9 @@ class Bar extends PartBase {
                     const barPosA = barA.length;
                     const barPosB = sideLineB.start.distanceTo(centerLineA.end);
 
-                    return { position: centerLineA.end, atStart: false, posA: barPosA, a: barA, posB: barPosB, b: barB, sideB: sideB };
+                    let butt = { position: centerLineA.end, atStart: false, posA: barPosA, a: barA, posB: barPosB, b: barB, sideB: sideB };
+                    return butt;
                 }
-                return undefined;
             }
         }
 

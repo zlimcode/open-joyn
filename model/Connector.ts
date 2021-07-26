@@ -1,11 +1,10 @@
-import PartBase, { vec2, vec3 } from "./PartBase";
+import PartBase from "./PartBase";
 
 import { jsonObject, jsonMember, jsonArrayMember } from "typedjson";
-import * as THREE from "three";
 
 
 @jsonObject
-class Connector extends PartBase {
+abstract class Connector extends PartBase {
     @jsonMember(Number)
     length: number;
 
@@ -16,4 +15,17 @@ class Connector extends PartBase {
     }
 }
 
-export default Connector;
+
+@jsonObject
+class ButtConnector extends Connector {
+
+}
+
+
+@jsonObject
+class OverlapConnector extends Connector {
+
+}
+
+
+export { Connector, ButtConnector, OverlapConnector };

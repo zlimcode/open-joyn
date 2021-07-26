@@ -5,12 +5,11 @@ import type { vec2, vec3 } from "./PartBase";
 import Panel from "./Panel";
 import Marker from "./Marker";
 import Bar from "./Bar";
+import {ButtConnector, OverlapConnector} from "./Connector";
 
 import type { OverlapConnectionResult, ButtConnectionResult } from "./Bar";
 
-
 import * as THREE from "three";
-import Connector from "./Connector";
 
 
 // let validateDefined = (name: string, v: any) => {
@@ -420,9 +419,9 @@ class Factory {
      * @category Connecting
      */
     join(bars: Bar[]) {
+        // const result: Connector[] = [];
         const candidatePairs = Bar.findCandidatePairs(bars);
         // candidatePairs.sort(() => (Math.random() > .5) ? 1 : -1);
-
 
         let overlaps: OverlapConnectionResult[] = [];
         let butts: ButtConnectionResult[] = [];
@@ -434,7 +433,7 @@ class Factory {
             let buttA = Bar.findButtConnection(barA, barB);
 
             if (buttA) {
-                // this.marker({ position: buttA.position.toArray(), radius: 5, color: 0xff00ff });
+                //this.marker({position: buttA.position.toArray(), color: 0xff0000});
                 butts.push(buttA);
                 return;
             }
@@ -442,7 +441,7 @@ class Factory {
             let buttB = Bar.findButtConnection(barB, barA);
 
             if (buttB) {
-                // this.marker({ position: buttB.position.toArray(), radius: 5, color: 0xff00ff });
+                //this.marker({position: buttB.position.toArray(), color: 0xff00ff});
                 butts.push(buttB);
                 return;
             }
@@ -450,19 +449,14 @@ class Factory {
             let overlap = Bar.findOverlapConnection(barA, barB);
 
             if (overlap) {
-                // this.marker({ position: overlap.position.toArray(), radius: 5, color: 0x00ffff });
                 overlaps.push(overlap);
                 return;
             }
         });
 
-
         let isOtherSide = (sideA: number, sideB: number): boolean => {
             return ((sideA + 2) % 4) == sideB;
-
-            // return true;
         };
-
 
         let isConnectedThrough = (sideA: number, posA: number, sideB: number, posB: number): boolean => {
             return (isOtherSide(sideA, sideB) && Math.abs(posA - posB) < 0.001); // TODO: use epsilon
@@ -475,7 +469,7 @@ class Factory {
         //overlaps.reverse();
 
 
-        let situations = overlaps.reduce((situations, conn) => {
+        let overlapSituations = overlaps.reduce((situations, conn) => {
             let matched = false;
 
             for (let situation of situations) {
@@ -511,34 +505,60 @@ class Factory {
         }, [] as OverlapConnectionResult[][]);
 
 
-        // situations = [];
+        for (const situation of overlapSituations) {
+            const first = situation[0];
+            const last = situation[situation.length - 1];
 
-        // for (let overlap of overlaps) {
-        //     situations.push([overlap]);
-        // }
+            const lineFirst = first.a.lineOnSide((first.sideA + 2) % 4);
+            const posFirst = lineFirst.start.clone().lerp(lineFirst.end, first.posA / first.a.length);
 
+            const lineLast = last.b.lineOnSide((last.sideB + 2) % 4);
+            const posLast = lineLast.start.clone().lerp(lineLast.end, last.posB / last.b.length);
 
-        for (let situation of situations) {
-            let first = situation[0];
-            let last = situation[situation.length - 1];
+            // TODO: all this above should be provided by Bar 
 
-            let lineFirst = first.a.lineOnSide((first.sideA + 2) % 4);
-            let posFirst = lineFirst.start.clone().lerp(lineFirst.end, first.posA / first.a.length);
+            const delta = posLast.clone().sub(posFirst);
+            const length = delta.length();
 
-            let lineLast = last.b.lineOnSide((last.sideB + 2) % 4);
-            let posLast = lineLast.start.clone().lerp(lineLast.end, last.posB / last.b.length);
-
-            let delta = posLast.clone().sub(posFirst);
-            let length = delta.length() - 10;
-
-            let connector = new Connector(length);
+            const connector = new OverlapConnector(length);
             this.finalizeAndAddPart(connector, { position: posFirst.toArray() });
             connector.rot.setFromUnitVectors(new THREE.Vector3(0, 0, 1), delta.normalize());
         }
 
+
+        for (const butt of butts) {
+
+            const lineFirst = butt.a.centerLine();
+
+            const lineSecond = butt.b.lineOnSide((butt.sideB + 2) % 4);
+            const posSecond = lineSecond.start.clone().lerp(lineSecond.end, butt.posB / butt.b.length);
+            
+            const length = butt.b.sizeMax() + butt.a.sizeMin();        // TODO: Make it correct. Check!
+
+            // TODO: all this above should be provided by Bar 
+
+            const delta = lineFirst.delta(new THREE.Vector3()).normalize();
+
+            if (!butt.atStart) {
+                delta.multiplyScalar(-1);
+            }
+
+            const connector = new ButtConnector(length);
+            this.finalizeAndAddPart(connector, { position: posSecond.toArray() });
+            connector.rot.setFromUnitVectors(new THREE.Vector3(0, 0, 1), delta.normalize());
+        }
+
+
+
+
+
+
+
         // console.log(situations);
 
         // console.log(this.construction.markers().length);  // TODO: remove
+
+        return 
     }
 
     private finalizeAndAddPart(part: PartBase, options: PartOptions) {

@@ -1,4 +1,4 @@
-import { Bar, Panel, Construction, Connector, PartBase, Marker } from "openjoyn/model";
+import { Bar, Panel, Construction, Connector, PartBase, Marker, OverlapConnector } from "openjoyn/model";
 import { makeBevelBoxGeometry } from "./helpers";
 
 import * as THREE from "three";
@@ -76,8 +76,8 @@ class SceneBuilder {
 
         this.connectorStandardMaterial = new THREE.MeshStandardMaterial(
             {
-                roughness: 0.25,
-                color: 0xff00ff,
+                roughness: 0.1,
+                color: 0x222222,
             });
 
 
@@ -187,20 +187,34 @@ class SceneBuilder {
 
 
     makeConnectorObj(connector: Connector): THREE.Object3D {
-        let mat = connector.debug ? this.connectorDebugMaterial : this.connectorStandardMaterial;
+        const mat = connector.debug ? this.connectorDebugMaterial : this.connectorStandardMaterial;
 
-        let cylinderGeo = new THREE.CylinderGeometry(2, 2, connector.length);
-        const cylinderMesh = new THREE.Mesh(cylinderGeo, mat);
-        cylinderMesh.rotateX(Math.PI * 0.5);
-        cylinderMesh.position.set(0, 0, connector.length * 0.5);
-        cylinderMesh.castShadow = true;
+        let throughCylGeo = new THREE.CylinderGeometry(5, 5, connector.length);
+        const throughCylMesh = new THREE.Mesh(throughCylGeo, mat);
+        throughCylMesh.rotateX(Math.PI * 0.5);
+        throughCylMesh.position.set(0, 0, connector.length * 0.5);
 
-        const sphereGeo = new THREE.SphereGeometry(6, 8, 6);
-        const sphereMesh = new THREE.Mesh(sphereGeo, mat);
+        // TODO: define somewhere else
+        let headCylStartGeo = new THREE.CylinderGeometry(19/2, 19/2-1, 2, 16);
+        const headCylStartMesh = new THREE.Mesh(headCylStartGeo, mat);
+        headCylStartMesh.rotateX(Math.PI * 0.5);
+        headCylStartMesh.position.set(0, 0, -2/2);
 
         const obj = new THREE.Object3D();
-        obj.add(cylinderMesh);
-        obj.add(sphereMesh);
+        obj.add(throughCylMesh);
+        obj.add(headCylStartMesh);
+
+        if (connector instanceof OverlapConnector) {
+            let headCylEndGeo = new THREE.CylinderGeometry(19/2-1, 19/2, 2, 16);
+            const headCylEndMesh = new THREE.Mesh(headCylEndGeo, mat);
+            headCylEndMesh.rotateX(Math.PI * 0.5);
+            headCylEndMesh.position.set(0, 0, connector.length + 2/2);
+            obj.add(headCylEndMesh);
+        }
+
+        // const sphereGeo = new THREE.SphereGeometry(6, 8, 6);
+        // const sphereMesh = new THREE.Mesh(sphereGeo, mat);
+
 
         applyPartPosRotToObj(connector, obj);
 
