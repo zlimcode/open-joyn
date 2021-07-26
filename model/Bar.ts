@@ -58,6 +58,8 @@ class Bar extends PartBase {
         v.applyQuaternion(this.rot);
         v.add(this.pos);
 
+        // TODO: cache?
+
         return v.toArray();
     }
 
@@ -70,6 +72,8 @@ class Bar extends PartBase {
         let v = new THREE.Vector3(0, 0, this.length - l);
         v.applyQuaternion(this.rot);
         v.add(this.pos);
+
+        // TODO: cache?
 
         return v.toArray();
     }
@@ -118,6 +122,7 @@ class Bar extends PartBase {
      * @returns
      */
     sideNormal(side: BarSide): THREE.Vector3 {
+        // TODO: cache?
         let baseNormal = SideUnitNormals[side].clone();
         return baseNormal.applyQuaternion(this.rot);
     }
@@ -129,7 +134,7 @@ class Bar extends PartBase {
      */
     lineOnSide(side: BarSide): THREE.Line3 {
         let sideVector = SideUnitNormals[side].clone();
-        sideVector.multiply(new Vector3(this.size[0], this.size[1], 0).multiplyScalar(0.5));
+        sideVector.multiply(new THREE.Vector3(this.size[0], this.size[1], 0).multiplyScalar(0.5));
 
         let start = sideVector.clone();
         start.applyQuaternion(this.rot);
@@ -139,6 +144,8 @@ class Bar extends PartBase {
         end.z = this.length;
         end.applyQuaternion(this.rot);
         end.add(this.pos);
+
+        // TODO: cache?
 
         let line = new THREE.Line3(start, end);
         return line;
@@ -153,6 +160,8 @@ class Bar extends PartBase {
         let end = new THREE.Vector3(0, 0, this.length);
         end.applyQuaternion(this.rot);
         end.add(this.pos);
+
+        // TODO: cache?
 
         return new THREE.Line3(this.pos, end);
     }
@@ -197,12 +206,11 @@ class Bar extends PartBase {
         const bBoxes = new Map<Bar, THREE.Box3>(boxes);
 
         const candidatePairs = barPairs.filter(([a, b]) => {
-            const boxA = bBoxes.get(a);
-            const boxB = bBoxes.get(b);
+            const boxA = bBoxes.get(a)!;
+            const boxB = bBoxes.get(b)!;
             return boxA.intersectsBox(boxB);
         });
 
-        console.log("VS: ", barPairs.length, candidatePairs.length);
         return candidatePairs;
     }
 
