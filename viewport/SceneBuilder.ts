@@ -132,7 +132,6 @@ class SceneBuilder {
 
         if (bar.debug) {
             for (let hole of bar.holes) {
-                console.log(hole);
                 let sideVec = bar.sideLocal(hole.side);
 
                 let start = sideVec.clone();
