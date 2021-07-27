@@ -124,8 +124,17 @@ class SceneBuilder {
         obj.add(mesh);
 
         if (bar.debug) {
-            let lineX = makeDebugLine(new THREE.Vector3(bar.size[0] * 0.5, 0, 0), new THREE.Vector3(bar.size[0] * 0.5, 0, bar.length), "#ff0000");
-            let lineY = makeDebugLine(new THREE.Vector3(0, bar.size[1] * 0.5, 0), new THREE.Vector3(0, bar.size[1] * 0.5, bar.length), "#00ff00");
+            let barSideLocalXStart = bar.sideLocal(0);
+            let barSideLocalXEnd = barSideLocalXStart.clone();
+            barSideLocalXEnd.z = bar.length;
+
+            let barSideLocalYStart = bar.sideLocal(1);
+            let barSideLocalYEnd = barSideLocalYStart.clone();
+            barSideLocalYEnd.z = bar.length;
+            
+            let lineX = makeDebugLine(barSideLocalXStart, barSideLocalXEnd, "#ff0000");
+            let lineY = makeDebugLine(barSideLocalYStart, barSideLocalYEnd, "#00ff00");
+            
             obj.add(lineX);
             obj.add(lineY);
         }

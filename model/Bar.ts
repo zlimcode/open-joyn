@@ -48,6 +48,11 @@ type OverlapConnectionResult = ConnectionResult & {
 const Epsilon = 0.001; // TODO: move out epsilon
 const EpsilonSq = Epsilon * Epsilon;
 
+
+function nearlyEqual(a: number, b: number) {
+    return (Math.abs(a-b) < Epsilon);
+};
+
 @jsonObject
 class BarHole {
     @jsonMember(Number)
@@ -67,6 +72,32 @@ class BarHole {
         this.side = side;
         this.diameter = diameter;
         this.depth = depth;
+    }
+
+    equals(other: BarHole) {
+        if (!nearlyEqual(this.position, other.position)) {
+            return false;
+        }
+
+        if (this.side != other.side) {
+            return false;
+        }
+
+        if (!nearlyEqual(this.diameter, other.diameter)) {
+            return false;
+        }
+
+        if (this.depth && other.depth) {
+            if (!nearlyEqual(this.depth, other.depth)) {
+                return false;
+            }
+        } else {
+            if (this.depth || other.depth) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
 
@@ -101,7 +132,6 @@ class Bar extends PartBase {
 
         this.holes.push(hole);
     }
-
 
     /**
      * Calculate a point on one of the Bars sides that has a given distance from the start of this side
@@ -212,7 +242,7 @@ class Bar extends PartBase {
      */
     sideLocal(side: BarSide): THREE.Vector3 {
         const sideVec = SideUnitNormals[side].clone();
-        sideVec.multiply(new THREE.Vector3(this.size[0], this.size[1], 0).multiplyScalar(0.5));
+        sideVec.multiply(new THREE.Vector3(this.size[0] * 0.5, this.size[1] * 0.5, 0));
         return sideVec;
     }
 
@@ -253,6 +283,70 @@ class Bar extends PartBase {
 
         return new THREE.Line3(this.pos, end);
     }
+
+    /**
+     * Are both sizes equal?
+     * @returns 
+     */
+    isSquare(): boolean {
+        return nearlyEqual(this.size[0], this.size[1]);
+    }
+
+    normalize() {
+        // TODO: reverse or not
+
+        // let newHoles = this.holes.map((hole) => {
+        //     return new BarHole(hole.position, hole.side, hole.diameter, hole.depth);
+        // });
+        let holes = this.holes;
+        holes.sort((a, b) => a.position - b.position);
+
+        let firstHoleSide = holes.length > 0 ? holes[0].side : 0;
+
+        if (this.isSquare()) {
+            holes.forEach((hole) => {
+                hole.side = (hole.side + firstHoleSide) % 4;
+            });
+        }
+
+        holes.forEach((hole) => {
+            if (hole.depth == undefined && hole.side > 1) {  // flip side of hole, if it's a through hole
+                hole.side = (hole.side + 2) % 4;
+            }
+        });
+
+        this.holes = holes;
+    }
+
+    equals(other: Bar) {
+        if (!nearlyEqual(this.length, other.length)) {
+            return false;
+        }
+
+        if (!nearlyEqual(this.size[0], other.size[0])) {
+            return false;
+        }
+
+        if (!nearlyEqual(this.size[1], other.size[1])) {
+            return false;
+        }
+
+        if (this.holes.length != other.holes.length) {
+            return false;
+        }
+
+        for (let holeIdx = 0; holeIdx < this.holes.length; holeIdx++) {
+            const thisHole = this.holes[holeIdx];
+            const otherHole = other.holes[holeIdx];
+
+            if (!thisHole.equals(otherHole)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
 
     /**
      * @ignore
