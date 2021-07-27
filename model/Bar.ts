@@ -5,7 +5,9 @@ import { closestPointsOnSegmentToSegment } from "./math";
 import { jsonObject, jsonMember, jsonArrayMember } from "typedjson";
 import * as THREE from "three";
 
-
+/**
+ * Valid indices for the sides of a Bar
+ */
 enum BarSide {
     N = 0,
     E = 1,
@@ -102,8 +104,20 @@ class Bar extends PartBase {
 
 
     /**
-     * Calculate a point on the bar that has a given distance from the start of the Bar.
-     * @param l distance from start of the bar
+     * Calculate a point on one of the Bars sides that has a given distance from the start of this side
+     * @param side side
+     * @param l distance from start of the side
+     * @returns the point
+     */
+    pointOnSide(side: BarSide, l: number) {
+        const line = this.lineOnSide(side);
+        const pos = line.start.clone().lerp(line.end, l / this.length);
+        return pos.toArray();
+    }
+
+    /**
+     * Calculate a point on the Bar that has a given distance from the start of the Bar.
+     * @param l distance from start of the Bar
      * @returns the point
      */
     pointFromStart(l: number): vec3 {
@@ -118,7 +132,7 @@ class Bar extends PartBase {
 
     /**
      * Calculate a point on the bar that has a given distance from the end of the Bar.
-     * @param l distance from end of the bar
+     * @param l distance from end of the Bar
      * @returns the point
      */
     pointFromEnd(l: number): vec3 {
@@ -180,7 +194,7 @@ class Bar extends PartBase {
 
     /**
      * @ignore
-     * Normalized normal vector a given side
+     * Normalized normal vector of a given side
      * @param side 
      * @returns
      */
@@ -192,18 +206,29 @@ class Bar extends PartBase {
 
     /**
      * @ignore
+     * 
+     * @param side 
+     * @returns
+     */
+    sideLocal(side: BarSide): THREE.Vector3 {
+        const sideVec = SideUnitNormals[side].clone();
+        sideVec.multiply(new THREE.Vector3(this.size[0], this.size[1], 0).multiplyScalar(0.5));
+        return sideVec;
+    }
+
+    /**
+     * @ignore
      * Line on a side of a Bar
      * @returns a line from start to end
      */
     lineOnSide(side: BarSide): THREE.Line3 {
-        let sideVector = SideUnitNormals[side].clone();
-        sideVector.multiply(new THREE.Vector3(this.size[0], this.size[1], 0).multiplyScalar(0.5));
+        const sideVec = this.sideLocal(side);
 
-        let start = sideVector.clone();
+        const start = sideVec.clone();
         start.applyQuaternion(this.rot);
         start.add(this.pos);
 
-        let end = sideVector.clone();
+        const end = sideVec.clone();
         end.z = this.length;
         end.applyQuaternion(this.rot);
         end.add(this.pos);

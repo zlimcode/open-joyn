@@ -1,3 +1,6 @@
+import type { vec2, vec3 } from "./PartBase";
+import * as THREE from "three";
+
 function pairs<T>(arr: T[]): [T, T][] {
     let res: [T, T][] = [];
 
@@ -68,7 +71,14 @@ function log(...args: any[]) {
 }
 
 
+function toVector3(v: vec3): THREE.Vector3 {
+    return new THREE.Vector3().fromArray(v);
+}
 
+
+function toVector2(v: vec2): THREE.Vector2 {
+    return new THREE.Vector2().fromArray(v);
+}
 
 
 // let validateDefined = (name: string, v: any) => {
@@ -94,4 +104,4 @@ function log(...args: any[]) {
 // };
 
 
-export { log, pairs, map, mapConstrain, constrain };
+export { log, pairs, map, mapConstrain, constrain, toVector2, toVector3 };

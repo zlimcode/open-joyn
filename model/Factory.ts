@@ -10,6 +10,7 @@ import { ButtConnector, OverlapConnector } from "./Connector";
 import type { OverlapConnectionResult, ButtConnectionResult } from "./Bar";
 
 import * as THREE from "three";
+import { toVector3 } from "./helpers";
 
 /**
  * Valid letters for an axis
@@ -175,7 +176,7 @@ class Factory {
         let newMatrix = currentMatrix.clone();
         this.matrixStack.push(newMatrix);
 
-        if (this.matrixStack.length > 32) {
+        if (this.matrixStack.length > 15) {
             throw new Error("push() called too often. Is it possible that you forgot a pop()?");
         }
     }
@@ -441,10 +442,7 @@ class Factory {
     join(bars: Bar[], options: JoinOptions) {
         let opts = { ...this.defaults.join, ...options };
 
-
-        // const result: Connector[] = [];
         const candidatePairs = Bar.findCandidatePairs(bars);
-        // candidatePairs.sort(() => (Math.random() > .5) ? 1 : -1);
 
         let overlaps: OverlapConnectionResult[] = [];
         let butts: ButtConnectionResult[] = [];
@@ -475,6 +473,62 @@ class Factory {
             }
         });
 
+        const overlapSituations = this.groupOverlaps(overlaps);
+
+        for (const situation of overlapSituations) {
+            const first = situation[0];
+            const last = situation[situation.length - 1];
+
+            const posFirst = first.a.pointOnSide((first.sideA + 2) % 4, first.posA);
+            const posLast = last.b.pointOnSide((last.sideB + 2) % 4, first.posB);
+
+            // Entry to exit
+            const delta = toVector3(posLast).sub(toVector3(posFirst));
+            const length = delta.length();
+
+            const connector = new OverlapConnector(length);
+            this.finalizeAndAddPart(connector, { position: posFirst, debug: opts.debug });
+            connector.rot.setFromUnitVectors(new THREE.Vector3(0, 0, 1), delta.normalize());
+
+            // Make holes
+            for (let i = 0; i < situation.length; i++) {
+                const conn = situation[i];
+
+                conn.a.addHole(conn.posA, (conn.sideA + 2) % 4, opts.overlapHoleDia!);
+
+                if (i == situation.length - 1) {
+                    conn.b.addHole(conn.posB, conn.sideB, opts.overlapHoleDia!);
+                }
+            }
+        }
+
+        for (const butt of butts) {
+            const lineFirst = butt.a.centerLine();
+            const posSecond = butt.b.pointOnSide((butt.sideB + 2) % 4, butt.posB);
+
+            const length = butt.b.sizeMax() + butt.a.sizeMax();        // TODO: Make it correct. Check!
+
+            // TODO: all this above should be provided by Bar 
+
+            const delta = lineFirst.delta(new THREE.Vector3()).normalize();
+
+            if (!butt.atStart) {
+                delta.multiplyScalar(-1);
+            }
+
+            const connector = new ButtConnector(length);
+            this.finalizeAndAddPart(connector,  { position: posSecond, debug: opts.debug });
+            connector.rot.setFromUnitVectors(new THREE.Vector3(0, 0, 1), delta.normalize());
+
+            // Make holes (one per bar)
+
+            // TODO: do!
+        }
+
+        return;
+    }
+
+    private groupOverlaps(overlaps: OverlapConnectionResult[]) {
         let isOtherSide = (sideA: number, sideB: number): boolean => {
             return ((sideA + 2) % 4) == sideB;
         };
@@ -484,11 +538,10 @@ class Factory {
         };
 
         // TODO: factor out
-        // TODO: find out why this works when kept sorted, fails otherwise...
+        // FIXME: find out why this works when kept sorted, fails otherwise...
 
-        //overlaps.sort(() => (Math.random() > .5) ? 1 : -1);
-        //overlaps.reverse();
-
+        // overlaps.sort(() => (Math.random() > .5) ? 1 : -1);
+        // overlaps.reverse();
 
         let overlapSituations = overlaps.reduce((situations, conn) => {
             let matched = false;
@@ -525,61 +578,7 @@ class Factory {
             return situations;
         }, [] as OverlapConnectionResult[][]);
 
-
-        for (const situation of overlapSituations) {
-            const first = situation[0];
-            const last = situation[situation.length - 1];
-
-            const lineFirst = first.a.lineOnSide((first.sideA + 2) % 4);
-            const posFirst = lineFirst.start.clone().lerp(lineFirst.end, first.posA / first.a.length);
-
-            const lineLast = last.b.lineOnSide((last.sideB + 2) % 4);
-            const posLast = lineLast.start.clone().lerp(lineLast.end, last.posB / last.b.length);
-
-            // TODO: all this above should be provided by Bar 
-
-            const delta = posLast.clone().sub(posFirst);
-            const length = delta.length();
-
-            const connector = new OverlapConnector(length);
-            this.finalizeAndAddPart(connector, { position: posFirst.toArray() });
-            connector.rot.setFromUnitVectors(new THREE.Vector3(0, 0, 1), delta.normalize());
-        }
-
-
-        for (const butt of butts) {
-
-            const lineFirst = butt.a.centerLine();
-
-            const lineSecond = butt.b.lineOnSide((butt.sideB + 2) % 4);
-            const posSecond = lineSecond.start.clone().lerp(lineSecond.end, butt.posB / butt.b.length);
-
-            const length = butt.b.sizeMax() + butt.a.sizeMin();        // TODO: Make it correct. Check!
-
-            // TODO: all this above should be provided by Bar 
-
-            const delta = lineFirst.delta(new THREE.Vector3()).normalize();
-
-            if (!butt.atStart) {
-                delta.multiplyScalar(-1);
-            }
-
-            const connector = new ButtConnector(length);
-            this.finalizeAndAddPart(connector, { position: posSecond.toArray() });
-            connector.rot.setFromUnitVectors(new THREE.Vector3(0, 0, 1), delta.normalize());
-        }
-
-
-
-
-
-
-
-        // console.log(situations);
-
-        // console.log(this.construction.markers().length);  // TODO: remove
-
-        return;
+        return overlapSituations;
     }
 
     private finalizeAndAddPart(part: PartBase, options: PartOptions) {

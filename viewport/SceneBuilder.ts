@@ -130,6 +130,22 @@ class SceneBuilder {
             obj.add(lineY);
         }
 
+        if (bar.debug) {
+            for (let hole of bar.holes) {
+                console.log(hole);
+                let sideVec = bar.sideLocal(hole.side);
+
+                let start = sideVec.clone();
+                start.z = hole.position;
+
+                let end = new THREE.Vector3();
+                end.z = hole.position;
+                let lineY = makeDebugLine(start, end, "#ff00ff");
+                obj.add(lineY);
+            }
+        }
+   
+
         // const edges = new THREE.EdgesGeometry(geo);
 
         // const lineMat2 = new THREE.LineBasicMaterial({
@@ -183,8 +199,6 @@ class SceneBuilder {
 
         return obj;
     }
-
-
 
     makeConnectorObj(connector: Connector): THREE.Object3D {
         const mat = connector.debug ? this.connectorDebugMaterial : this.connectorStandardMaterial;
