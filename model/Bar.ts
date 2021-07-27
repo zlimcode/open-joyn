@@ -46,6 +46,27 @@ type OverlapConnectionResult = ConnectionResult & {
 const Epsilon = 0.001; // TODO: move out epsilon
 const EpsilonSq = Epsilon * Epsilon;
 
+@jsonObject
+class BarHole {
+    @jsonMember(Number)
+    position: number;
+
+    @jsonMember(Number)
+    side: BarSide;
+
+    @jsonMember(Number)
+    diameter: number;
+
+    @jsonMember(Number)
+    depth?: number;
+
+    constructor(position: number, side: BarSide, diameter: number, depth?: number) {
+        this.position = position;
+        this.side = side;
+        this.diameter = diameter;
+        this.depth = depth;
+    }
+}
 
 
 /**
@@ -60,11 +81,23 @@ class Bar extends PartBase {
     @jsonArrayMember(Number)
     size: vec2;
 
+    @jsonArrayMember(BarHole)
+    holes: BarHole[];
+
+
     constructor(length: number, size: vec2) {
         super();
 
         this.length = length;
         this.size = size;
+
+        this.holes = [];
+    }
+
+    addHole(position: number, side: BarSide, diameter: number, depth?: number) {
+        const hole = new BarHole(position, side, diameter, depth);
+
+        this.holes.push(hole);
     }
 
 
@@ -328,5 +361,5 @@ class Bar extends PartBase {
 
 
 export default Bar;
-export { BarSide };
+export { BarSide, BarHole };
 export type { OverlapConnectionResult, ButtConnectionResult };
