@@ -5,13 +5,11 @@ import type { vec2, vec3 } from "./PartBase";
 import Panel from "./Panel";
 import Marker from "./Marker";
 import Bar from "./Bar";
-import {ButtConnector, OverlapConnector} from "./Connector";
+import { ButtConnector, OverlapConnector } from "./Connector";
 
 import type { OverlapConnectionResult, ButtConnectionResult } from "./Bar";
 
 import * as THREE from "three";
-
-
 
 /**
  * Valid letters for an axis
@@ -19,10 +17,24 @@ import * as THREE from "three";
 type Axis = "x" | "y" | "z" | "+x" | "+y" | "+z" | "-x" | "-y" | "-z";
 
 
+/**
+ * Options for joinign parts
+ * @category Factory
+ */
+interface JoinOptions {
+    /** Hole diameter for overlapping connections */
+    overlapHoleDia?: number;
+
+
+    // TODO: butts!
+
+    /** Draw the part highlighted in the preview */
+    debug?: boolean;
+};
 
 /**
  * Common options for creating parts
- * 
+ * @category Factory
  */
 interface PartOptions {
     /** An optional name */
@@ -100,6 +112,28 @@ function negateAxis(axis: Axis): Axis {
     return axis;
 }
 
+
+const DefaultDefaults = {
+    bar: {
+        size: [40, 40],
+        length: 100,
+        axis: "z"
+    } as BarOptions,
+    panel: {
+        size: [100, 100],
+        thickness: 12,
+        axis: "z"
+    } as PanelOptions,
+    marker: {
+        radius: 5.0,
+        axis: "z"
+    } as MarkerOptions,
+    join: {
+        overlapHoleDia: 10.0,
+    } as JoinOptions
+};
+
+
 /**
  * A convenience construction factory, mainly used by the user API.
  * This is usually automatically created for you.
@@ -115,22 +149,7 @@ class Factory {
     private grid = [40, 40, 40];
     private currentGroup = "default";
 
-    private defaults = {
-        bar: {
-            size: [40, 40],
-            length: 100,
-            axis: "z"
-        } as BarOptions,
-        panel: {
-            size: [100, 100],
-            thickness: 12,
-            axis: "z"
-        } as PanelOptions,
-        marker: {
-            radius: 10.0,
-            axis: "z"
-        } as MarkerOptions
-    };
+    private defaults = DefaultDefaults;
 
     // group = "default";
 
@@ -393,19 +412,36 @@ class Factory {
     }
 
     /**
-     * Join all Bars that have been generated so far.
+     * Set default options used for joining Bars.
+     * Setting the same option when calling `join()` or `joinAll()` will overwrite this option.
+     * @param options options to apply to defaults
+     * @returns the currently set defaults
      * @category Connecting
      */
-    joinAll() {
-        this.join(this.construction.bars());
+    defaultsJoin(options: JoinOptions) {
+        this.defaults.join = { ...this.defaults.join, ...options };
+        return this.defaults.join;
+    }
+
+    /**
+     * Join all Bars that have been generated so far.
+     * @param options
+     * @category Connecting
+     */
+    joinAll(options: JoinOptions) {
+        this.join(this.construction.bars(), options);
     }
 
     /**
      * Join the given Bars.
      * @param bars an array of Bars
+     * @param options
      * @category Connecting
      */
-    join(bars: Bar[]) {
+    join(bars: Bar[], options: JoinOptions) {
+        let opts = { ...this.defaults.join, ...options };
+
+
         // const result: Connector[] = [];
         const candidatePairs = Bar.findCandidatePairs(bars);
         // candidatePairs.sort(() => (Math.random() > .5) ? 1 : -1);
@@ -420,7 +456,6 @@ class Factory {
             let buttA = Bar.findButtConnection(barA, barB);
 
             if (buttA) {
-                //this.marker({position: buttA.position.toArray(), color: 0xff0000});
                 butts.push(buttA);
                 return;
             }
@@ -428,7 +463,6 @@ class Factory {
             let buttB = Bar.findButtConnection(barB, barA);
 
             if (buttB) {
-                //this.marker({position: buttB.position.toArray(), color: 0xff00ff});
                 butts.push(buttB);
                 return;
             }
@@ -519,7 +553,7 @@ class Factory {
 
             const lineSecond = butt.b.lineOnSide((butt.sideB + 2) % 4);
             const posSecond = lineSecond.start.clone().lerp(lineSecond.end, butt.posB / butt.b.length);
-            
+
             const length = butt.b.sizeMax() + butt.a.sizeMin();        // TODO: Make it correct. Check!
 
             // TODO: all this above should be provided by Bar 
@@ -545,7 +579,7 @@ class Factory {
 
         // console.log(this.construction.markers().length);  // TODO: remove
 
-        return 
+        return;
     }
 
     private finalizeAndAddPart(part: PartBase, options: PartOptions) {
@@ -607,4 +641,4 @@ class Factory {
 }
 
 export default Factory;
-export type { Factory, BarOptions, PanelOptions, MarkerOptions, Axis };
+export type { Factory, JoinOptions, BarOptions, PanelOptions, MarkerOptions, Axis };
