@@ -480,7 +480,7 @@ class Factory {
             const last = situation[situation.length - 1];
 
             const posFirst = first.a.pointOnSide((first.sideA + 2) % 4, first.posA);
-            const posLast = last.b.pointOnSide((last.sideB + 2) % 4, first.posB);
+            const posLast = last.b.pointOnSide((last.sideB + 2) % 4, last.posB);
 
             // Entry to exit
             const delta = toVector3(posLast).sub(toVector3(posFirst));
