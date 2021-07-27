@@ -3,6 +3,7 @@ import { Step } from "openjoyn/model";
 
 import type { Style } from "openjoyn/style";
 import { getStyle } from "openjoyn/style";
+import { groupByEqual, groupByPredicate } from "./helpers";
 
 
 class Plan {
@@ -51,6 +52,32 @@ class Plan {
             console.warn("Adding step for group", missingGroupName, "which is missing in steps");
             steps.push(step);
         }
+
+        // TODO: should construction be mutated?
+        for (const bar of construction.bars()) {
+            bar.normalize();
+        }
+
+        let barsByGroups = construction.barsByGroups(steps.map((step) => step.groupName));
+
+        for (const step of steps) {
+            let bars = barsByGroups.get(step.groupName)!;
+            
+            let sameBars = groupByEqual(bars, (a, b) => a.equals(b));
+
+            for (let i = 0; i < sameBars.length; i++) {
+                const same = sameBars[i];
+                
+                const name = `${step.prefixOrGroup()}_${i+1}`;
+
+                for (const bar of same) {
+                    bar.name = name;
+                }
+            }
+        }
+
+        console.log(barsByGroups);
+
 
         return new Plan(meta, construction, style, steps);
     }

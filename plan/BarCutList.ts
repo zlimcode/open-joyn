@@ -3,12 +3,12 @@ import type Plan from "./Plan";
 
 import { groupByPredicate, fixedPrecision } from "./helpers";
 
-type BarCutPosition = {
+type BarCutListItem = {
     size: vec2;
-    pieces: BarCutPositionPieces[];
+    pieces: BarCutListItemPieces[];
 };
 
-type BarCutPositionPieces = {
+type BarCutListItemPieces = {
     length: number,
     bars: Bar[];
 };
@@ -30,12 +30,14 @@ class BarCutList {
     groupBySize(bars: Bar[]) {
         bars.sort((a, b) => a.size[0] - b.size[0]);
 
+
+        // TODO: precision from style...
         const sizePredicateFn = (bar: Bar) => `${fixedPrecision(bar.size[0], this.plan.style.precision)}x${fixedPrecision(bar.size[1], this.plan.style.precision)}`;
         const barsBySize = groupByPredicate(bars, sizePredicateFn);
         return [...barsBySize.values()];
     }
 
-    positions(): BarCutPosition[] {
+    positions(): BarCutListItem[] {
         let bars = this.plan.construction.bars();
         let sizeGroups = this.groupBySize(bars);
 
@@ -44,7 +46,7 @@ class BarCutList {
 
             let pieces = this.groupByLength(groupBars);
 
-            let position: BarCutPosition = {
+            let position: BarCutListItem = {
                 size: size,
                 pieces: pieces.map((p) => {
                     return {
@@ -61,5 +63,5 @@ class BarCutList {
     }
 }
 
-export default BarCutList;
-export type { BarCutPosition };
+export { BarCutList };
+export type { BarCutListItem };

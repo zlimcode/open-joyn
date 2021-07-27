@@ -1,5 +1,7 @@
+import { PartBase } from "openjoyn/model";
+
 /**
- * Group an array of items by a given predicate.
+ * Group an array of items by a given predicate. The predicate needs to be hashable
  * 
  * Each collection of each group will keep the same relative order as in the input collection.
  * 
@@ -10,10 +12,10 @@
 function groupByPredicate<T, TP>(arr: T[], predicateFn: ((item: T) => TP)) {
     let map = arr.reduce((acc: Map<any, T[]>, item) => {
         const predicate = predicateFn(item);
-        if (!acc.has(predicate)) {
-            acc.set(predicate, [item]);
+        if (acc.has(predicate)) {
+            acc.get(predicate)!.push(item);
         } else {
-            acc.get(predicate).push(item);
+            acc.set(predicate, [item]);
         }
 
         return acc;
@@ -22,12 +24,43 @@ function groupByPredicate<T, TP>(arr: T[], predicateFn: ((item: T) => TP)) {
     return map as Map<TP, T[]>;
 }
 
+/**
+ * Group an array of items by comparing equality.
+ * 
+ * Each array of each group will keep the same relative order as in the input collection.
+ * 
+ * @param arr array of items
+ * @param equalityFn function returning equality for two items
+ * @returns array of arrays of equal items
+ */
+function groupByEqual<T>(arr: T[], equalityFn: ((a: T, b: T) => boolean)): T[][] {
+    let groups: T[][] = [];
+    for (const item of arr) {
+        let matched = false;
+        for (const group of groups) {
+            const groupFirst = group[0];
+
+            if (equalityFn(groupFirst, item)) {
+                group.push(item);
+                matched = true;
+                break;
+            }
+        }
+
+        if (!matched) {
+            groups.push([item]);
+        }
+    }
+
+    return groups;
+}
+
 
 function fixedPrecision(v: number, precision: number) {
-    let m = 10^precision
+    let m = 10 ^ precision;
     let n = v / m;
     let p = Math.round(n) * m;
     return p.toFixed(0);
 }
 
-export { groupByPredicate, fixedPrecision };
+export { groupByPredicate, groupByEqual, fixedPrecision };
