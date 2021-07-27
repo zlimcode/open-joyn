@@ -12,27 +12,6 @@ import type { OverlapConnectionResult, ButtConnectionResult } from "./Bar";
 import * as THREE from "three";
 
 
-// let validateDefined = (name: string, v: any) => {
-//     if (v === undefined) {
-//         throw new Error("Parameter must be defined");
-//     }
-// };
-
-// let validatePosition3 = (name: string, v: any) => {
-//     validateDefined(name, v);
-//     validateTuple(name, v, 3);
-// };
-
-
-// let validateNumber = (_name: string, v: any) => {
-
-// };
-
-// let validateTuple = (name: string, v: any, elementCount: number) => {
-//     if (v.length != elementCount) {
-//         throw new Error("Argument must have " + elementCount + " elements");
-//     }
-// };
 
 /**
  * Valid letters for an axis
@@ -161,7 +140,7 @@ class Factory {
      */
     constructor() {
         this.construction = new Construction();
-        this.matrixStack = [new THREE.Matrix4()];
+        this.resetMatrix();
     }
 
     private currentMatrix(): THREE.Matrix4 {
@@ -194,6 +173,14 @@ class Factory {
         }
 
         this.matrixStack.pop();
+    }
+
+    /**
+     * Resets all currently applied transformations.
+     * @category Transformation
+     */
+    resetMatrix() {
+        this.matrixStack = [new THREE.Matrix4()];
     }
 
     /**

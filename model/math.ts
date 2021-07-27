@@ -30,4 +30,8 @@ function closestPointsOnSegmentToSegment(segA: THREE.Vector3, segB: THREE.Vector
 };
 
 
+
+
+// Lifted from: https://zalo.github.io/blog/closest-point-between-segments/
+
 export { closestToSegment, closestPointOnSegmentToLine, closestPointsOnSegmentToSegment };

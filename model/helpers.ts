@@ -68,6 +68,30 @@ function log(...args: any[]) {
 }
 
 
-// Lifted from: https://zalo.github.io/blog/closest-point-between-segments/
+
+
+
+// let validateDefined = (name: string, v: any) => {
+//     if (v === undefined) {
+//         throw new Error("Parameter must be defined");
+//     }
+// };
+
+// let validatePosition3 = (name: string, v: any) => {
+//     validateDefined(name, v);
+//     validateTuple(name, v, 3);
+// };
+
+
+// let validateNumber = (_name: string, v: any) => {
+
+// };
+
+// let validateTuple = (name: string, v: any, elementCount: number) => {
+//     if (v.length != elementCount) {
+//         throw new Error("Argument must have " + elementCount + " elements");
+//     }
+// };
+
 
 export { log, pairs, map, mapConstrain, constrain };
