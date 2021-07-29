@@ -111,9 +111,9 @@ class Parameter implements ParameterOptions {
         return this.options;
     }
 
-    normalizedOptions(): [any, any][] | undefined {
+    normalizedOptions(): [any, any][] {
         if (!this.options) {
-            return undefined;
+            return [];
         }
 
         let out = this.options.map((o) => {
