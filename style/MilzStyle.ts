@@ -15,7 +15,6 @@ let MilzStyle: Style = {
         stock: "m8"
     },
 
-
     precision: 0
 };
 
