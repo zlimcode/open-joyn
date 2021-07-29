@@ -37,7 +37,7 @@ class BarCutList {
         return [...barsBySize.values()];
     }
 
-    positions(): BarCutListItem[] {
+    items(): BarCutListItem[] {
         let bars = this.plan.construction.bars();
         let sizeGroups = this.groupBySize(bars);
 

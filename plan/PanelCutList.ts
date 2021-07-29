@@ -1,7 +1,17 @@
-import type { Panel } from "openjoyn/model";
-import type { vec2 } from "openjoyn/model/PartBase";
+import type { Panel, vec2 } from "openjoyn/model";
 import type Plan from "./Plan";
 
+import { groupByPredicate, fixedPrecision } from "./helpers";
+
+type PanelCutListItem = {
+    thickness: number;
+    pieces: PanelCutListItemPiece[];
+};
+
+type PanelCutListItemPiece = {
+    size: vec2,
+    panels: Panel[];
+};
 
 class PanelCutList {
     private plan: Plan;
@@ -10,24 +20,50 @@ class PanelCutList {
         this.plan = plan;
     }
 
-    pieces(): Map<vec2, Panel[]> {
-        let construction = this.plan.construction;
-        let panels = construction.panels();
-        panels.sort((a, b) => a.size[0] - b.size[0]);   
+    groupByThickness(panels: Panel[]) {
+        panels.sort((a, b) => a.thickness - b.thickness);
 
-        const panelsBySize = panels.reduce((acc: Map<vec2, Panel[]>, panel) => {
-            let size = panel.size;  // TODO: round, reorder
-            if (!acc.has(size)) {
-                acc.set(size, [panel]);
-            } else {
-                acc.get(size).push(panel);
-            }
+        const barsByLength = groupByPredicate(panels, (panel) => fixedPrecision(panel.thickness, this.plan.style.precision));
+        return [...barsByLength.values()];
+    }
 
-            return acc;
-        }, new Map<vec2, Panel[]>());
+    groupBySize(panels: Panel[]) {
+        panels.sort((a, b) => a.size[0] - b.size[0]);
 
-        return panelsBySize;
+        // TODO: precision from style...
+        const sizePredicateFn = (panel: Panel) => `${fixedPrecision(panel.size[0], this.plan.style.precision)}x${fixedPrecision(panel.size[1], this.plan.style.precision)}`;
+
+        const panelsBySize = groupByPredicate(panels, sizePredicateFn);
+        return [...panelsBySize.values()];
+    }
+
+    items(): PanelCutListItem[] {
+        const panels = this.plan.construction.panels();
+        const thicknessGroups = this.groupByThickness(panels);
+
+        let items = thicknessGroups.map((groupPanels) => {
+            let thicknessGroupTemplate = groupPanels[0];
+
+            const piecesBySize = this.groupBySize(groupPanels);
+
+            let item: PanelCutListItem = {
+                thickness: thicknessGroupTemplate.thickness,
+
+                pieces: piecesBySize.map((piecePanels) => {
+
+                    return {
+                        size: piecePanels[0].size,
+                        panels: piecePanels
+                    };
+                })
+            };
+
+            return item;
+        });
+
+        return items;
     }
 }
 
-export default PanelCutList;
+export { PanelCutList };
+export type { PanelCutListItem };
