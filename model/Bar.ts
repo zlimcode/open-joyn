@@ -318,6 +318,10 @@ class Bar extends PartBase {
         this.holes = holes;
     }
 
+    holesOnSide(side: BarSide) {
+        return this.holes.filter((hole) => hole.side == side);
+    }
+
     equals(other: Bar) {
         if (!nearlyEqual(this.length, other.length)) {
             return false;
