@@ -50,7 +50,7 @@ const EpsilonSq = Epsilon * Epsilon;
 
 
 function nearlyEqual(a: number, b: number) {
-    return (Math.abs(a-b) < Epsilon);
+    return (Math.abs(a - b) < Epsilon);
 };
 
 @jsonObject

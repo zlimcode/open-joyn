@@ -6,6 +6,8 @@ import Parameter from "./Parameter";
 import Step from "./Step";
 
 import Bar from "./Bar";
+import { BarHole } from "./Bar";
+
 import Panel from "./Panel";
 import Marker from "./Marker";
 import { Connector, ButtConnector, OverlapConnector } from "./Connector";
@@ -31,6 +33,9 @@ TypedJSON.mapType(THREE.Quaternion, {
 });
 
 
-export { Construction, Meta, Parameter, PartBase, Connector, ButtConnector, OverlapConnector, Marker, Bar, Panel, Factory, Step };
-export {log, map, mapConstrain, constrain} from "./helpers";
+export { Construction, Meta, Parameter, Factory, Step };
+export { PartBase, Connector, ButtConnector, OverlapConnector, Marker, Bar, Panel };
+export { BarHole };
+
+export { log, map, mapConstrain, constrain } from "./helpers";
 export type { vec2, vec3 };
