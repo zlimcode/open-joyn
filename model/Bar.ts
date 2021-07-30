@@ -315,6 +315,9 @@ class Bar extends PartBase {
             }
         });
 
+
+        // FIXME: general handling of holes that are not flipped to one of the first two sides...
+
         this.holes = holes;
     }
 
