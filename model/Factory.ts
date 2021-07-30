@@ -38,8 +38,8 @@ interface JoinOptions {
  * @category Factory
  */
 interface PartOptions {
-    /** An optional name */
-    name?: string,
+    // /** An optional name */
+    // name?: string,
 
     /** Position of the origin as `[x, y, z]` */
     position?: vec3,
@@ -585,9 +585,9 @@ class Factory {
         // TODO: from default style
         // TODO: use typedjson to validate??
 
-        if (options.name) {
-            part.name = options.name;
-        }
+        // if (options.name) {
+        //     part.name = options.name;
+        // }
 
         if (options.debug) {
             part.debug = options.debug;
