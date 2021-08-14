@@ -76,9 +76,6 @@ class Plan {
             }
         }
 
-        console.log(barsByGroups);
-
-
         return new Plan(meta, construction, style, steps);
     }
 };
