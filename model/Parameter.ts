@@ -42,6 +42,9 @@ interface ParameterOptions {
 
     /** Classes for styling. */
     class?: string;
+
+    /** Hide in final application? */
+    hidden?: boolean;
 }
 
 
@@ -78,6 +81,9 @@ class Parameter implements ParameterOptions {
 
     @jsonMember(String)
     class?: string
+
+    @jsonMember(Boolean)
+    hidden?: boolean
 
     constructor(p: ParameterOptions) {
         Object.assign(this, p);

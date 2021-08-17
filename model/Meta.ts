@@ -27,11 +27,10 @@ interface MetaOptions {
 
     /** Name of the style referenced. Will be used for choice of materials and connections. */
     style?: string;
+
+    /** How difficult? */
+    difficulty?: number;
 };
-
-
-
-
 
 
 /**
@@ -59,10 +58,14 @@ class Meta implements MetaOptions {
     @jsonMember(String)
     style: string = "default";
 
+    @jsonMember(Number)
+    difficulty?: number;
+
     constructor(p: Partial<Meta>) {
         Object.assign(this, p);
     }
 };
+
 
 export default Meta;
 export type { MetaOptions };
