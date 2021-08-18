@@ -31,7 +31,6 @@ class SceneBuilder {
     connectorStandardMaterial: THREE.Material;
     connectorDebugMaterial: THREE.Material;
 
-
     panelStandardMaterial: THREE.Material;
     panelDebugMaterial: THREE.Material;
 
@@ -258,19 +257,30 @@ class SceneBuilder {
     }
 
     makeGroup(): THREE.Group {
-        let group = new THREE.Group();
+        let mainGroup = new THREE.Group();
         let parts = this.construction.parts;
+
+        let groupGroups = new Map<string, THREE.Group>();
+
+        this.construction.groupNames().forEach(groupName => {
+            const groupGroup = new THREE.Group();
+            groupGroup.name = groupName;
+            groupGroups.set(groupName, groupGroup);
+            mainGroup.add(groupGroup);
+        });
+
         parts.forEach(part => {
             let sceneObj = this.makeSceneObj(part);
+            const groupGroup = groupGroups.get(part.group)!;
 
             if (sceneObj) {
-                group.add(sceneObj);
+                groupGroup.add(sceneObj);
             }
         });
 
-        group.scale.set(0.1, 0.1, 0.1);
+        mainGroup.scale.set(0.1, 0.1, 0.1);
 
-        return group;
+        return mainGroup;
     }
 
     makeDebugGroup(): THREE.Group {
