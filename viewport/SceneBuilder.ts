@@ -40,7 +40,7 @@ class SceneBuilder {
 
         this.barStandardMaterial = new THREE.MeshStandardMaterial(
             {
-                color: 0xe6d488,
+                color: 0xebe49f,
                 // polygonOffset: true,
                 // polygonOffsetUnits: 1,
                 // polygonOffsetFactor: 1
