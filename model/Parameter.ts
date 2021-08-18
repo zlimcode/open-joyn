@@ -25,6 +25,9 @@ interface ParameterOptions {
     /** Label to display in the UI. */
     label?: string;
 
+    /** Description/explanation for the parameters. */
+    description?: string;
+
     /** Minimum value for numbers. */
     min?: number;
 
@@ -63,6 +66,9 @@ class Parameter implements ParameterOptions {
 
     @jsonMember(String)
     label?: string;
+
+    @jsonMember(String)
+    description?: string;
 
     @jsonMember(Number)
     min?: number;
