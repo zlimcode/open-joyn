@@ -1,4 +1,6 @@
-import Executor from "./Executor";
+import IframeExecutor from "./IframeExecutor";
+import DirectExecutor from "./DirectExecutor";
+
 import { ExecutionError, ErrorType, CodeLocation } from "./Error";
 
-export { Executor, CodeLocation, ExecutionError, ErrorType };
+export { IframeExecutor, DirectExecutor, CodeLocation, ExecutionError, ErrorType };
