@@ -19,6 +19,15 @@ class Plan {
         this.steps = steps;
     }
 
+    hasBars() {
+        return this.construction.bars().length > 0;
+    }
+
+    hasPanels() {
+        return this.construction.panels().length > 0;
+    }
+
+
     static make(meta: Meta, construction: Construction) {
         if (!meta.style) {
             console.warn("No style set. Choosing default");
@@ -62,13 +71,13 @@ class Plan {
 
         for (const step of steps) {
             let bars = barsByGroups.get(step.groupName)!;
-            
+
             let sameBars = groupByEqual(bars, (a, b) => a.equals(b));
 
             for (let i = 0; i < sameBars.length; i++) {
                 const same = sameBars[i];
-                
-                const name = `${step.prefixOrGroup()}_${i+1}`;
+
+                const name = `${step.prefixOrGroup()}_${i + 1}`;
 
                 for (const bar of same) {
                     bar.name = name;
