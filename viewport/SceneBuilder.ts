@@ -10,6 +10,12 @@ const debugColor = new THREE.Color(0xff4500);
 function applyPartPosRotToObj(part: PartBase, obj: THREE.Object3D) {
     obj.position.copy(part.pos);
     obj.quaternion.copy(part.rot);
+
+    if (part.name) {
+        obj.name = part.name;
+    }
+
+    obj.userData.part = part;
 }
 
 function makeDebugLine(from: THREE.Vector3, to: THREE.Vector3, color?: string) {
@@ -22,20 +28,51 @@ function makeDebugLine(from: THREE.Vector3, to: THREE.Vector3, color?: string) {
     return line;
 }
 
+function makeInactiveMaterial(template: THREE.MeshStandardMaterial) {
+    const mat = template.clone();
+
+    mat.opacity = 0.5;
+    mat.transparent = true;
+
+    return mat;
+}
+
+
+function makeHighlightMaterial(template: THREE.MeshStandardMaterial) {
+    const mat = template.clone();
+
+    //mat.color = new THREE.Color(0xff4500);
+    return mat;
+}
+
+
+type ObjectOptions = {
+    highlight?: boolean;
+    inactive?: boolean;
+};
+
 
 class SceneBuilder {
     construction: Construction;
-    barStandardMaterial: THREE.Material;
+
+    barStandardMaterial: THREE.MeshStandardMaterial;
+    barInactiveMaterial: THREE.MeshStandardMaterial;
+    barHighlightMaterial: THREE.MeshStandardMaterial;
     barDebugMaterial: THREE.Material;
 
-    connectorStandardMaterial: THREE.Material;
-    connectorDebugMaterial: THREE.Material;
+    connectorStandardMaterial: THREE.MeshStandardMaterial;
+    connectorInactiveMaterial: THREE.MeshStandardMaterial;
+    connectorHighlightMaterial: THREE.MeshStandardMaterial;
+    connectorDebugMaterial: THREE.MeshStandardMaterial;
 
-    panelStandardMaterial: THREE.Material;
+    panelStandardMaterial: THREE.MeshStandardMaterial;
+    panelInactiveMaterial: THREE.MeshStandardMaterial;
+    panelHighlightMaterial: THREE.MeshStandardMaterial;
     panelDebugMaterial: THREE.Material;
 
     constructor(construction: Construction) {
         this.construction = construction;
+
 
         this.barStandardMaterial = new THREE.MeshStandardMaterial(
             {
@@ -86,11 +123,19 @@ class SceneBuilder {
                 opacity: 0.25,
                 transparent: true,
                 side: THREE.DoubleSide
-
             });
+
+        this.panelInactiveMaterial = makeInactiveMaterial(this.panelStandardMaterial);
+        this.panelHighlightMaterial = makeHighlightMaterial(this.panelStandardMaterial);
+
+        this.barInactiveMaterial = makeInactiveMaterial(this.barStandardMaterial);
+        this.barHighlightMaterial = makeHighlightMaterial(this.barStandardMaterial);
+
+        this.connectorInactiveMaterial = makeInactiveMaterial(this.connectorStandardMaterial);
+        this.connectorHighlightMaterial = makeHighlightMaterial(this.connectorStandardMaterial);
     }
 
-    makeMarkerObj(marker: Marker): THREE.Object3D {
+    makeMarkerObj(marker: Marker, options: ObjectOptions): THREE.Object3D {
         const geo = new THREE.SphereGeometry(marker.radius, 8, 6);
 
         const mat = new THREE.MeshStandardMaterial({
@@ -110,10 +155,17 @@ class SceneBuilder {
         return obj;
     }
 
-    makeBarObj(bar: Bar): THREE.Object3D {
+    makeBarObj(bar: Bar, options: ObjectOptions): THREE.Object3D {
         const geo = makeBevelBoxGeometry(bar.size, bar.length, bevelDefault);
 
-        let mat = bar.debug ? this.barDebugMaterial : this.barStandardMaterial;
+        let mat: THREE.Material = this.barStandardMaterial;
+
+        if (options.highlight) {
+            mat = this.barHighlightMaterial;
+        } else if (options.inactive) {
+            mat = this.barInactiveMaterial;
+        }
+        mat = bar.debug ? this.barDebugMaterial : mat;
 
         const mesh = new THREE.Mesh(geo, mat);
         mesh.position.set(0, 0, bar.length * 0.5);
@@ -130,10 +182,10 @@ class SceneBuilder {
             let barSideLocalYStart = bar.sideLocal(1);
             let barSideLocalYEnd = barSideLocalYStart.clone();
             barSideLocalYEnd.z = bar.length;
-            
+
             let lineX = makeDebugLine(barSideLocalXStart, barSideLocalXEnd, "#ff0000");
             let lineY = makeDebugLine(barSideLocalYStart, barSideLocalYEnd, "#00ff00");
-            
+
             obj.add(lineX);
             obj.add(lineY);
         }
@@ -151,7 +203,7 @@ class SceneBuilder {
                 obj.add(lineY);
             }
         }
-   
+
 
         // const edges = new THREE.EdgesGeometry(geo);
 
@@ -191,9 +243,17 @@ class SceneBuilder {
         return obj;
     }
 
-    makePanelObj(panel: Panel): THREE.Object3D {
+    makePanelObj(panel: Panel, options: ObjectOptions): THREE.Object3D {
         const geo = makeBevelBoxGeometry(panel.size, panel.thickness, bevelDefault, bevelDefault);
-        let mat = panel.debug ? this.panelDebugMaterial : this.panelStandardMaterial;
+
+        let mat: THREE.Material = this.panelStandardMaterial;
+
+        if (options.highlight) {
+            mat = this.panelHighlightMaterial;
+        } else if (options.inactive) {
+            mat = this.panelInactiveMaterial;
+        }
+        mat = panel.debug ? this.panelDebugMaterial : mat;
 
         const mesh = new THREE.Mesh(geo, mat);
         mesh.position.set(0, 0, panel.thickness * 0.5);
@@ -207,8 +267,16 @@ class SceneBuilder {
         return obj;
     }
 
-    makeConnectorObj(connector: Connector): THREE.Object3D {
-        const mat = connector.debug ? this.connectorDebugMaterial : this.connectorStandardMaterial;
+    makeConnectorObj(connector: Connector, options: ObjectOptions): THREE.Object3D {
+        let mat: THREE.Material = this.connectorStandardMaterial;
+
+        if (options.highlight) {
+            mat = this.connectorHighlightMaterial;
+        } else if (options.inactive) {
+            mat = this.connectorInactiveMaterial;
+        }
+        mat = connector.debug ? this.connectorDebugMaterial : mat;
+
 
         let throughCylGeo = new THREE.CylinderGeometry(5, 5, connector.length);
         const throughCylMesh = new THREE.Mesh(throughCylGeo, mat);
@@ -216,20 +284,20 @@ class SceneBuilder {
         throughCylMesh.position.set(0, 0, connector.length * 0.5);
 
         // TODO: define somewhere else
-        let headCylStartGeo = new THREE.CylinderGeometry(19/2, 19/2-1, 2, 16);
+        let headCylStartGeo = new THREE.CylinderGeometry(19 / 2, 19 / 2 - 1, 2, 16);
         const headCylStartMesh = new THREE.Mesh(headCylStartGeo, mat);
         headCylStartMesh.rotateX(Math.PI * 0.5);
-        headCylStartMesh.position.set(0, 0, -2/2);
+        headCylStartMesh.position.set(0, 0, -2 / 2);
 
         const obj = new THREE.Object3D();
         obj.add(throughCylMesh);
         obj.add(headCylStartMesh);
 
         if (connector instanceof OverlapConnector) {
-            let headCylEndGeo = new THREE.CylinderGeometry(19/2-1, 19/2, 2, 16);
+            let headCylEndGeo = new THREE.CylinderGeometry(19 / 2 - 1, 19 / 2, 2, 16);
             const headCylEndMesh = new THREE.Mesh(headCylEndGeo, mat);
             headCylEndMesh.rotateX(Math.PI * 0.5);
-            headCylEndMesh.position.set(0, 0, connector.length + 2/2);
+            headCylEndMesh.position.set(0, 0, connector.length + 2 / 2);
             obj.add(headCylEndMesh);
         }
 
@@ -242,39 +310,100 @@ class SceneBuilder {
         return obj;
     }
 
-    makeSceneObj(part: PartBase): THREE.Object3D | undefined {
+    makeSceneObj(part: PartBase, options: object): THREE.Object3D | undefined {
         if (part instanceof Bar) {
-            return this.makeBarObj(part);
+            return this.makeBarObj(part, options);
         } else if (part instanceof Panel) {
-            return this.makePanelObj(part);
+            return this.makePanelObj(part, options);
         } else if (part instanceof Marker) {
-            return this.makeMarkerObj(part);
-        }  else if (part instanceof Connector) {
-            return this.makeConnectorObj(part);
+            return this.makeMarkerObj(part, options);
+        } else if (part instanceof Connector) {
+            return this.makeConnectorObj(part, options);
         }
 
         console.warn("Unhandled part", part);
     }
 
-    makeGroup(): THREE.Group {
+
+    makePreview(): THREE.Group {
+        const allGroupNames = Array.from(this.construction.groupNames());
+
+        return this.makeGroup(allGroupNames, []);
+    }
+
+    makeGroup(displayGroups: string[], highlightGroups: string[]): THREE.Group {
         let mainGroup = new THREE.Group();
-        let parts = this.construction.parts;
 
         let groupGroups = new Map<string, THREE.Group>();
 
-        this.construction.groupNames().forEach(groupName => {
+        const displayGroupsSet = new Set(displayGroups);
+        const highlightGroupsSet = new Set(highlightGroups);
+
+        const parts = this.construction.parts.filter(part => {
+            if (part instanceof Connector) {
+                // TODO: handle hacky resolution of connectors
+                const connector = part as Connector;
+
+                const groupA = connector.parts[0].group;
+                const groupB = connector.parts[connector.parts.length - 1].group;
+
+                return displayGroupsSet.has(groupA) && displayGroupsSet.has(groupB);
+            } else {
+                return displayGroupsSet.has(part.group);
+            }
+        });
+
+        displayGroups.forEach(groupName => {
             const groupGroup = new THREE.Group();
             groupGroup.name = groupName;
             groupGroups.set(groupName, groupGroup);
             mainGroup.add(groupGroup);
         });
 
+        const connectorsGroup = new THREE.Group();
+        connectorsGroup.name = "_connectors";
+        groupGroups.set("_connectors", connectorsGroup);
+        mainGroup.add(connectorsGroup);
+
         parts.forEach(part => {
-            let sceneObj = this.makeSceneObj(part);
-            const groupGroup = groupGroups.get(part.group)!;
+            let options = {
+                highlight: false,
+                inactive: false,
+            };
+
+            if (highlightGroupsSet.has(part.group)) {
+                options.highlight = true;
+            } else if (highlightGroups.length > 0) {
+                options.inactive = true;
+            }
+
+            if (part instanceof Connector) {
+                // TODO: handle hacky resolution of connectors
+                const connector = part as Connector;
+                const groupA = connector.parts[0].group;
+                const groupB = connector.parts[connector.parts.length - 1].group;
+
+                options.highlight = false;
+                options.inactive = true;
+
+                if (highlightGroupsSet.has(groupA) || highlightGroupsSet.has(groupB)) {
+                    options.highlight = true;
+                    options.inactive = false;
+                }
+            }
+
+            let sceneObj = this.makeSceneObj(part, options);
 
             if (sceneObj) {
-                groupGroup.add(sceneObj);
+                if (part instanceof Connector) {
+                    const groupGroup = groupGroups.get("_connectors")!;
+
+                    groupGroup.add(sceneObj);
+                } else {
+                    const groupGroup = groupGroups.get(part.group)!;
+
+                    groupGroup.add(sceneObj);
+                }
             }
         });
 
