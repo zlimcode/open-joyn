@@ -486,10 +486,6 @@ class Factory {
             const delta = toVector3(posLast).sub(toVector3(posFirst));
             const length = delta.length();
 
-            const connector = new OverlapConnector(length);
-            this.finalizeAndAddPart(connector, { position: posFirst, debug: opts.debug });
-            connector.rot.setFromUnitVectors(new THREE.Vector3(0, 0, 1), delta.normalize());
-
             // Make holes
             for (let i = 0; i < situation.length; i++) {
                 const conn = situation[i];
@@ -500,6 +496,24 @@ class Factory {
                     conn.b.addHole(conn.posB, conn.sideB, opts.overlapHoleDia!);
                 }
             }
+
+            const parts: PartBase[] = [];
+
+            console.log(situation);
+
+            for (let i = 0; i < situation.length; i++) {
+                const conn = situation[i];
+
+                parts.push(conn.a);
+
+                if (i == situation.length - 1) {
+                    parts.push(conn.b);
+                }
+            }
+
+            const connector = new OverlapConnector(length, parts);
+            this.finalizeAndAddPart(connector, { position: posFirst, debug: opts.debug });
+            connector.rot.setFromUnitVectors(new THREE.Vector3(0, 0, 1), delta.normalize());
         }
 
         for (const butt of butts) {
@@ -516,8 +530,8 @@ class Factory {
                 delta.multiplyScalar(-1);
             }
 
-            const connector = new ButtConnector(length);
-            this.finalizeAndAddPart(connector,  { position: posSecond, debug: opts.debug });
+            const connector = new ButtConnector(length, [butt.a, butt.b]);
+            this.finalizeAndAddPart(connector, { position: posSecond, debug: opts.debug });
             connector.rot.setFromUnitVectors(new THREE.Vector3(0, 0, 1), delta.normalize());
 
             // Make holes (one per bar)
