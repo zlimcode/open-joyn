@@ -384,7 +384,10 @@ class SceneBuilder {
                 const groupB = connector.parts[connector.parts.length - 1].group;
 
                 options.highlight = false;
-                options.inactive = true;
+
+                if (highlightGroups.length > 0) {
+                    options.inactive = true;
+                }
 
                 if (highlightGroupsSet.has(groupA) || highlightGroupsSet.has(groupB)) {
                     options.highlight = true;
