@@ -1,5 +1,5 @@
 import type { Panel, vec2 } from "openjoyn/model";
-import type Plan from "./Plan";
+import type { Plan } from "./Plan";
 
 import { groupByPredicate, fixedPrecision } from "./helpers";
 
@@ -30,7 +30,6 @@ class PanelCutList {
     groupBySize(panels: Panel[]) {
         panels.sort((a, b) => a.size[0] - b.size[0]);
 
-        // TODO: precision from style...
         const sizePredicateFn = (panel: Panel) => `${fixedPrecision(panel.size[0], this.plan.style.precision)}x${fixedPrecision(panel.size[1], this.plan.style.precision)}`;
 
         const panelsBySize = groupByPredicate(panels, sizePredicateFn);

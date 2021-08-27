@@ -6,17 +6,25 @@ import { getStyle } from "openjoyn/style";
 import { groupByEqual, groupByPredicate } from "./helpers";
 
 
+type PlanOptions = {
+    name: string,
+    barStockLength?: number
+};
+
+
 class Plan {
     meta: Meta;
     construction: Construction;
     style: Style;
     steps: Step[];
+    options: PlanOptions;
 
-    constructor(meta: Meta, construction: Construction, style: Style, steps: Step[]) {
+    constructor(meta: Meta, construction: Construction, options: PlanOptions, style: Style, steps: Step[]) {
         this.meta = meta;
         this.construction = construction;
         this.style = style;
         this.steps = steps;
+        this.options = options;
     }
 
     hasBars() {
@@ -27,8 +35,7 @@ class Plan {
         return this.construction.panels().length > 0;
     }
 
-
-    static make(meta: Meta, construction: Construction) {
+    static make(meta: Meta, construction: Construction, options: PlanOptions) {
         if (!meta.style) {
             console.warn("No style set. Choosing default");
         }
@@ -37,6 +44,10 @@ class Plan {
 
         if (!style) {
             throw new Error(`Could not find style ${meta.style}`);
+        }
+
+        if (options.barStockLength) {
+            style.bars.stockLength = options.barStockLength;
         }
 
         let groupNames = construction.groupNames();
@@ -85,9 +96,10 @@ class Plan {
             }
         }
 
-        return new Plan(meta, construction, style, steps);
+        return new Plan(meta, construction, options, style, steps);
     }
 };
 
 
-export default Plan;
+export { Plan };
+export type {PlanOptions};

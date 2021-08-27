@@ -1,4 +1,5 @@
-import Plan from "./Plan";
+import { Plan } from "./Plan";
+import type { PlanOptions } from "./Plan";
 
 import { BarCutList } from "./BarCutList";
 import type { BarCutListItem } from "./BarCutList";
@@ -9,6 +10,7 @@ import type { PanelCutListItem } from "./PanelCutList";
 import { BarDrillList, BarDrillListItem } from "./BarDrillList";
 
 export { Plan };
+export type {PlanOptions};
 
 export { PanelCutList };
 export type { PanelCutListItem };

@@ -1,5 +1,5 @@
 import { jsonObject, jsonMember, jsonArrayMember, TypedJSON } from "typedjson";
-import type Plan from "./Plan";
+import type { Plan } from "./Plan";
 
 import { groupByPredicate } from "./helpers";
 
