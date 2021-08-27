@@ -1,7 +1,6 @@
 import type { Panel, vec2 } from "openjoyn/model";
 import type { Plan } from "./Plan";
 
-import { groupByPredicate, fixedPrecision } from "./helpers";
 
 type PanelCutListItem = {
     thickness: number;
@@ -20,30 +19,14 @@ class PanelCutList {
         this.plan = plan;
     }
 
-    groupByThickness(panels: Panel[]) {
-        panels.sort((a, b) => a.thickness - b.thickness);
-
-        const barsByLength = groupByPredicate(panels, (panel) => fixedPrecision(panel.thickness, this.plan.style.precision));
-        return [...barsByLength.values()];
-    }
-
-    groupBySize(panels: Panel[]) {
-        panels.sort((a, b) => a.size[0] - b.size[0]);
-
-        const sizePredicateFn = (panel: Panel) => `${fixedPrecision(panel.size[0], this.plan.style.precision)}x${fixedPrecision(panel.size[1], this.plan.style.precision)}`;
-
-        const panelsBySize = groupByPredicate(panels, sizePredicateFn);
-        return [...panelsBySize.values()];
-    }
-
     items(): PanelCutListItem[] {
         const panels = this.plan.construction.panels();
-        const thicknessGroups = this.groupByThickness(panels);
+        const thicknessGroups = this.plan.groupPanelsByThickness(panels);
 
         let items = thicknessGroups.map((groupPanels) => {
             let thicknessGroupTemplate = groupPanels[0];
 
-            const piecesBySize = this.groupBySize(groupPanels);
+            const piecesBySize = this.plan.groupPanelsBySize(groupPanels);
 
             let item: PanelCutListItem = {
                 thickness: thicknessGroupTemplate.thickness,

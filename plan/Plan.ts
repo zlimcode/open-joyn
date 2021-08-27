@@ -3,12 +3,15 @@ import { Step } from "openjoyn/model";
 
 import type { Style } from "openjoyn/style";
 import { getStyle } from "openjoyn/style";
-import { groupByEqual, groupByPredicate } from "./helpers";
+import { groupByEqual, groupByPredicate, fixedPrecision } from "./helpers";
+
+import type { Bar, Panel } from "openjoyn/model";
+
 
 
 type PlanOptions = {
     name: string,
-    barStockLength?: number
+    barStockLength?: number;
 };
 
 
@@ -34,6 +37,41 @@ class Plan {
     hasPanels() {
         return this.construction.panels().length > 0;
     }
+
+
+    groupPanelsByThickness(panels: Panel[]) {
+        panels.sort((a, b) => a.thickness - b.thickness);
+
+        const barsByLength = groupByPredicate(panels, (panel) => fixedPrecision(panel.thickness, this.style.precision));
+        return [...barsByLength.values()];
+    }
+
+    groupPanelsBySize(panels: Panel[]) {
+        panels.sort((a, b) => a.size[0] - b.size[0]);
+
+        const sizePredicateFn = (panel: Panel) => `${fixedPrecision(panel.size[0], this.style.precision)}x${fixedPrecision(panel.size[1], this.style.precision)}`;
+
+        const panelsBySize = groupByPredicate(panels, sizePredicateFn);
+        return [...panelsBySize.values()];
+    }
+
+
+
+    groupBarsByLength(bars: Bar[]) {
+        bars.sort((a, b) => a.length - b.length);
+
+        const barsByLength = groupByPredicate(bars, (bar) => fixedPrecision(bar.length, this.style.precision));
+        return [...barsByLength.values()];
+    }
+
+    groupBarsBySize(bars: Bar[]) {
+        bars.sort((a, b) => a.size[0] - b.size[0]);
+
+        const sizePredicateFn = (bar: Bar) => `${fixedPrecision(bar.size[0], this.style.precision)}x${fixedPrecision(bar.size[1], this.style.precision)}`;
+        const barsBySize = groupByPredicate(bars, sizePredicateFn);
+        return [...barsBySize.values()];
+    }
+
 
     static make(meta: Meta, construction: Construction, options: PlanOptions) {
         if (!meta.style) {
@@ -102,4 +140,4 @@ class Plan {
 
 
 export { Plan };
-export type {PlanOptions};
+export type { PlanOptions };

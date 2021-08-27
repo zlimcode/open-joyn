@@ -1,4 +1,4 @@
-import type { Construction, Bar } from "openjoyn/model";
+import type { Bar } from "openjoyn/model";
 import type { Plan } from "./Plan";
 
 import { groupByPredicate } from "./helpers";
