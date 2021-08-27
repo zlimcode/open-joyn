@@ -499,8 +499,6 @@ class Factory {
 
             const parts: PartBase[] = [];
 
-            console.log(situation);
-
             for (let i = 0; i < situation.length; i++) {
                 const conn = situation[i];
 
