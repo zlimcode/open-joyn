@@ -1,5 +1,5 @@
 import type { Bar, vec2 } from "openjoyn/model";
-import type Plan from "./Plan";
+import type { Plan } from "./Plan";
 
 import { groupByPredicate, fixedPrecision } from "./helpers";
 
@@ -30,8 +30,6 @@ class BarCutList {
     groupBySize(bars: Bar[]) {
         bars.sort((a, b) => a.size[0] - b.size[0]);
 
-
-        // TODO: precision from style...
         const sizePredicateFn = (bar: Bar) => `${fixedPrecision(bar.size[0], this.plan.style.precision)}x${fixedPrecision(bar.size[1], this.plan.style.precision)}`;
         const barsBySize = groupByPredicate(bars, sizePredicateFn);
         return [...barsBySize.values()];
