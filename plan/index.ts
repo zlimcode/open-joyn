@@ -9,6 +9,9 @@ import type { PanelCutListItem } from "./PanelCutList";
 
 import { BarDrillList, BarDrillListItem } from "./BarDrillList";
 
+import { ShoppingList } from "./ShoppingList";
+import type { ShoppingListItem } from "./ShoppingList";
+
 export { Plan };
 export type {PlanOptions};
 
@@ -21,3 +24,5 @@ export type { BarDrillListItem };
 export { BarCutList };
 export type { BarCutListItem };
 
+export { ShoppingList };
+export type { ShoppingListItem };
