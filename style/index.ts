@@ -8,7 +8,8 @@ let styles = new Map<string, Style>([
 
 
 function getStyle(styleName: string) {
-    return styles.get(styleName);
+    const style = styles.get(styleName);
+    return JSON.parse(JSON.stringify(style)) as Style;       // deep copy
 }
 
 export { getStyle };
