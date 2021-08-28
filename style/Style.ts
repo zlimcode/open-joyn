@@ -1,3 +1,4 @@
+
 interface Style {
     panels: {
         stock: string;
@@ -8,10 +9,19 @@ interface Style {
 
     bars: {
         stock: string;
+
+        /* Length of bar stock, mm */
+        stockLength: number;
+
+        /* Material for each cut, mm */
+        stockCutExtra: number;
     };
 
     connections: {
         stock: string;
+
+
+
     };
 
     /** Precision for display and grouping. -1 = centimeters, 0 = whole millimeters, 1 = tenth of a millimeter */

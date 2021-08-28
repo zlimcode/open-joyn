@@ -1,13 +1,111 @@
 import type { Plan } from "./Plan";
+import type { Bar, Panel } from "openjoyn/model";
 
+
+
+const BarTemplate: ShoppingListItem = {
+    amount: 0,
+    label: "Holzlatte",
+    properties: "",
+    description: "z.B. Rahmenholz Kiefer",
+
+    suppliers: [
+        { label: "Obi", url: "https://www.obi.de/hobelware/rahmenholz-fichte-tanne-gehobelt-gefast-34-mm-x-34-mm-x-2500-mm/p/3260965" },
+        { label: "Bauhaus", url: "https://www.bauhaus.info/latten-rahmen/rahmenholz/p/20832575" },
+        { label: "Hagebau", url: "https://www.hagebau.de/p/klenk-holz-rahmenholz-fichte-tanne-bxh-34-x-34-cm-glatt-anP7000120700/" }
+    ]
+};
+
+
+const PanelTemplate: ShoppingListItem = {
+    amount: 0,
+    label: "Platte",
+    properties: "",
+
+    description: "z.B. Multiplexplatte Birke",
+
+    suppliers: [
+    ]
+};
+
+
+const NutTemplate: ShoppingListItem = {
+    amount: 0,
+    label: "Hülsenmutter",
+    properties: "M8 x 16 mm",
+
+    description: "Stahl verzinkt, schwarz, Kopf-Ø: 19mm, Kopfdicke: 2,5mm, Innengewinde: M8, SchaftØ: 10mm, Innensechskant: 5mm",
+
+    suppliers: [
+        { label: "eBay", url: "https://www.ebay.de/itm/264698428718?var=564854020829" },
+        { label: "eBay", url: "https://www.ebay.de/itm/313544526680?var=612372723962" }
+    ]
+
+};
+
+
+const RodTemplate: ShoppingListItem = {
+    amount: 0,
+    label: "Gewindebolzen",
+    properties: "",
+
+    description: "Stahl verzinkt ",
+
+    suppliers: [
+        { label: "eBay", url: "https://www.ebay.de/itm/124092120957?var=424919687383" },
+        { label: "eBay", url: "https://www.ebay.de/itm/124092120957" },
+        { label: "Stabilo", url: "https://www.stabilo-sanitaer.de/search/?query=gewindestift+m8" }
+    ]
+
+};
+
+
+
+
+
+
+
+
+type Supplier = {
+    label: string,
+    url: string;
+};
 
 type ShoppingListItem = {
     amount: number;
-    unit: string;
+    unit?: string;
 
     label: string;
+    properties: string;
     description: string;
+
+    suppliers: Supplier[];
 };
+
+
+
+
+function calculateLength(bars: Bar[]) {
+    let l = 0.0;
+
+    for (const bar of bars) {
+        l += bar.length;
+    }
+
+    return l;
+}
+
+function calculateArea(panels: Panel[]) {
+    let a = 0.0;
+
+    for (const panel of panels) {
+        a += panel.size[0] * panel.size[1];
+    }
+
+    return a;
+}
+
+
 
 class ShoppingList {
     private plan: Plan;
@@ -16,33 +114,84 @@ class ShoppingList {
         this.plan = plan;
     }
 
+    barItems(): ShoppingListItem[] {
+        const bars = this.plan.construction.bars();
+        const barsBySize = this.plan.groupBarsBySize(bars);
 
+        let items = [];
+
+        for (const sizeBars of barsBySize) {
+            const templateBar = sizeBars[0];
+
+            const l = calculateLength(sizeBars);
+            const stocks = Math.ceil(l / this.plan.style.bars.stockLength);
+
+            let item = Object.assign({}, BarTemplate);
+            item.amount = stocks;
+            item.properties = `${templateBar.size[0]} × ${templateBar.size[1]} mm, `;
+
+            items.push(item);
+        }
+        return items;
+    }
+
+    panelItems(): ShoppingListItem[] {
+        const panels = this.plan.construction.panels();
+        const panelsByThickness = this.plan.groupPanelsByThickness(panels);
+
+        let items = [];
+
+        for (const thicknessPanels of panelsByThickness) {
+            const templatePanel = thicknessPanels[0];
+
+            const area = calculateArea(thicknessPanels) / (1000 * 1000);
+
+            let item = Object.assign({}, PanelTemplate);
+            item.amount = area;
+            item.unit = "m²";
+            item.properties = `${templatePanel.thickness.toFixed(0)} mm, `;
+
+            items.push(item);
+        }
+
+        return items;
+    }
+
+    connectorItems(): ShoppingListItem[] {
+        const connectors = this.plan.construction.connectors();
+
+        let nutItem = Object.assign({}, NutTemplate);
+        nutItem.amount = connectors.length * 2;
+
+        const connectorsByLength = this.plan.groupConnectorsByLength(connectors);
+
+        let rodItems: ShoppingListItem[] = [];
+
+        for (const lengthConnector of connectorsByLength) {
+            const templateConnector = lengthConnector[0];
+            const l = templateConnector.length;
+            const rodL = l - 10.0;
+            const roundedL = Math.floor(rodL / 10.0) * 10;  // TODO: from style
+
+            let rodItem = Object.assign({}, RodTemplate);
+            rodItem.amount = lengthConnector.length;
+            rodItem.properties = `${roundedL.toFixed(0)} mm lang, `;
+
+            rodItems.push(rodItem);
+        }
+
+
+        let items = [nutItem, ...rodItems];
+
+        return items;
+    }
+
+    extraItems(): ShoppingListItem[] {
+        return [];
+    }
 
     items(): ShoppingListItem[] {
-        // let bars = this.plan.construction.bars();
-        // let sizeGroups = this.plan.groupBarsBySize(bars);
-
-        // let out = sizeGroups.map((groupBars) => {
-        //     let size = groupBars[0].size;
-
-        //     let pieces = this.plan.groupBarsByLength(groupBars);
-
-        //     let position: BarCutListItem = {
-        //         size: size,
-        //         pieces: pieces.map((p) => {
-        //             return {
-        //                 length: p[0].length,
-        //                 bars: p
-        //             };
-        //         })
-        //     };
-
-        //     return position;
-        // });
-
-        // return out;
-
-        return [];
+        return [...this.barItems(), ...this.panelItems(), ...this.connectorItems(), ...this.extraItems()];
     }
 }
 

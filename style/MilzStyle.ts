@@ -3,7 +3,9 @@ import type Style from "./Style";
 let MilzStyle: Style = {
 
     bars: {
-        stock: "spruce_quadratic"
+        stock: "spruce_quadratic",
+        stockLength: 3000.0,
+        stockCutExtra: 5.0
     },
 
     panels: {

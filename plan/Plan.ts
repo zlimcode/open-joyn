@@ -1,4 +1,4 @@
-import type { Construction, Meta } from "openjoyn/model";
+import type { Connector, Construction, Meta } from "openjoyn/model";
 import { Step } from "openjoyn/model";
 
 import type { Style } from "openjoyn/style";
@@ -55,8 +55,6 @@ class Plan {
         return [...panelsBySize.values()];
     }
 
-
-
     groupBarsByLength(bars: Bar[]) {
         bars.sort((a, b) => a.length - b.length);
 
@@ -71,6 +69,15 @@ class Plan {
         const barsBySize = groupByPredicate(bars, sizePredicateFn);
         return [...barsBySize.values()];
     }
+
+
+    groupConnectorsByLength(connectors: Connector[]) {
+        connectors.sort((a, b) => a.length - b.length);
+
+        const connectorsByLength = groupByPredicate(connectors, (connector) => fixedPrecision(connector.length, 10));       // TODO: connector configurable
+        return [...connectorsByLength.values()];    
+    }
+
 
 
     static make(meta: Meta, construction: Construction, options: PlanOptions) {
