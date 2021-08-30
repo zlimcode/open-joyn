@@ -32,9 +32,9 @@ const PanelTemplate: ShoppingListItem = {
 const NutTemplate: ShoppingListItem = {
     amount: 0,
     label: "Hülsenmutter",
-    properties: "M8 x 16 mm, ",
+    properties: "M8 x 16 mm",
 
-    description: "Stahl verzinkt, schwarz, Kopf-Ø: 19 mm, Kopfdicke: 2,5 mm, Innengewinde: M8, SchaftØ: 10 mm, Innensechskant: 5 mm",
+    description: "Stahl verzinkt, schwarz, Kopf-Ø: 19 mm, Kopfdicke: 2,5 mm, Innengewinde: M8, Schaft-Ø: 10 mm, Innensechskant: 5 mm",
 
     suppliers: [
         { label: "eBay", url: "https://www.ebay.de/itm/264698428718?var=564854020829" },
@@ -49,7 +49,7 @@ const RodTemplate: ShoppingListItem = {
     label: "Gewindebolzen",
     properties: "",
 
-    description: "Stahl verzinkt ",
+    description: "M8, Stahl verzinkt",
 
     suppliers: [
         { label: "eBay", url: "https://www.ebay.de/itm/124092120957?var=424919687383" },
@@ -133,7 +133,7 @@ class ShoppingList {
 
             let item = Object.assign({}, BarTemplate);
             item.amount = stocks;
-            item.properties = `${templateBar.size[0]} × ${templateBar.size[1]} mm, ${fixedLocale(stockLm, 1)} m, `;
+            item.properties = `${templateBar.size[0]} × ${templateBar.size[1]} mm, ${fixedLocale(stockLm, 1)} m`;
 
             items.push(item);
         }
@@ -154,7 +154,7 @@ class ShoppingList {
             let item = Object.assign({}, PanelTemplate);
             item.amount = `${fixedLocale(area, 2)}`;
             item.unit = "m²";
-            item.properties = `${fixedLocale(templatePanel.thickness, 0)} mm, `;
+            item.properties = `${fixedLocale(templatePanel.thickness, 0)} mm`;
 
             items.push(item);
         }
@@ -180,7 +180,7 @@ class ShoppingList {
 
             let rodItem = Object.assign({}, RodTemplate);
             rodItem.amount = lengthConnector.length;
-            rodItem.properties = `${fixedLocale(roundedL, 0)} mm lang, `;
+            rodItem.properties = `${fixedLocale(roundedL, 0)} mm lang`;
 
             rodItems.push(rodItem);
         }
