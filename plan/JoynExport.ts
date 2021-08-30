@@ -57,15 +57,12 @@ class JoynConstruction {
 }
 
 
-
-
 class JoynExport {
     private plan: Plan;
 
     constructor(plan: Plan) {
         this.plan = plan;
     }
-
 
     generate() {
         const construction = this.plan.construction;
@@ -83,7 +80,6 @@ class JoynExport {
         if (meta.description) {
             jmConstruction.description = meta.description;
         }
-
 
         for (const group of barsByName.values()) {
             for (let barIdx = 0; barIdx < group.length; barIdx++) {

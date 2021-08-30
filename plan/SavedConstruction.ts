@@ -4,6 +4,7 @@ type SavedConstruction = {
     hash: string,
     blueprint: string,
     name: string,
+    permalink: string,
 
     data: {
         values: { [key: string]: any },
