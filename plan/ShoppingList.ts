@@ -133,7 +133,7 @@ class ShoppingList {
 
             let item = Object.assign({}, BarTemplate);
             item.amount = stocks;
-            item.properties = `${templateBar.size[0]} × ${templateBar.size[1]} mm, ${fixedLocale(stockLm, 1)} m`;
+            item.properties = `${fixedLocale(stockLm, 1)} m, ${templateBar.size[0]} × ${templateBar.size[1]} mm`;
 
             items.push(item);
         }
