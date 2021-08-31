@@ -63,4 +63,9 @@ function fixedPrecision(v: number, precision: number) {
     return p.toFixed(0);
 }
 
-export { groupByPredicate, groupByEqual, fixedPrecision };
+
+function naturalCompare(a: string, b: string) {
+    return a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" });
+};
+
+export { groupByPredicate, groupByEqual, naturalCompare, fixedPrecision };

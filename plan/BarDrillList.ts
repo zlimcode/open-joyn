@@ -1,7 +1,7 @@
 import type { Bar } from "openjoyn/model";
 import type { Plan } from "./Plan";
 
-import { groupByPredicate } from "./helpers";
+import { groupByPredicate, naturalCompare } from "./helpers";
 import type { BarHole } from "openjoyn/model/Bar";
 
 type BarDrillListItem = {
@@ -25,10 +25,8 @@ class BarDrillList {
     items(): BarDrillListItem[] {
         let construction = this.plan.construction;
         let barsWithHoles = construction.bars().filter((bar) => bar.holes.length > 0);
-        // bars.sort((a, b) => a.sizeMax() - b.sizeMax());
-        // bars.sort((a, b) => a.length - b.length);
 
-        barsWithHoles.sort((a, b) => a.name.localeCompare(b.name));
+        barsWithHoles.sort((a, b) => naturalCompare(a.name, b.name));
 
         const barsByName = groupByPredicate(barsWithHoles, (bar) => bar.name);
 
