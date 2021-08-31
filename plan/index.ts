@@ -12,6 +12,9 @@ import { BarDrillList, BarDrillListItem } from "./BarDrillList";
 import { ShoppingList } from "./ShoppingList";
 import type { ShoppingListItem } from "./ShoppingList";
 
+import { AssembleList } from "./AssembleList";
+import type { AssembleListItem } from "./AssembleList";
+
 import type { SavedConstruction } from "./SavedConstruction";
 
 
@@ -30,5 +33,9 @@ export type { BarCutListItem };
 
 export { ShoppingList };
 export type { ShoppingListItem };
+
+export { AssembleList };
+export type { AssembleListItem };
+
 
 export type { SavedConstruction };
