@@ -44,6 +44,10 @@ class Construction {
         return partGroupsFromKeys(groups, bars);
     }
 
+    barsOfGroup(group: string) {
+        return this.bars().filter(p => p.group === group);
+    }
+
     panels() {
         return this.parts.filter((p) => p instanceof Panel) as Panel[];
     }
@@ -51,6 +55,10 @@ class Construction {
     panelsByGroups(groups: string[]) {
         let panels = this.panels();
         return partGroupsFromKeys(groups, panels);
+    }
+
+    panelsOfGroup(group: string) {
+        return this.panels().filter(p => p.group === group);
     }
 
     markers() {
@@ -69,6 +77,10 @@ class Construction {
     connectorsByGroups(groups: string[]) {
         let connectors = this.connectors();
         return partGroupsFromKeys(groups, connectors);
+    }
+
+    connectorsOfGroup(group: string) {
+        return this.connectors().filter(p => p.group === group);
     }
 
     partsByGroups(groups: string[]) {
