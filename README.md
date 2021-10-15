@@ -48,7 +48,7 @@ let f = new Factory();
 There are plenty of options which can be set for the whole construction. e.g. `f.defaultsBar()`
 
 ```js
-f.defaultsBar({ size: [p.34, p.34]}); //sets the standard bar size to 34x34mm
+f.defaultsBar({ size: [34, 34]}); //sets the standard bar size to 34x34mm
 ```
 
 ### Create a bar
@@ -69,7 +69,7 @@ f.barZ({ position: [0,0,0], length: 400 }); // bar orientated in Z axis
 The debug option can be set globally in `f.defaultsBar()` and helps to identify flaws during the design process.
 
 ```js
-f.defaultsBar({ size: [p.34, p.34], debug: true}); //activates debug render mode
+f.defaultsBar({ size: [34, 34], debug: true}); //activates debug render mode
 ```
 
 ![Debug](doc/debug.jpg)
@@ -81,10 +81,10 @@ In order to create in 3d space the push/pop matrix method is used and is combine
 
 ```js
 f.push();
-    f.moveGrid(1,-0.5,0.5);
+    f.moveGrid(1, -0.5, 0.5);
 		// equivalent (if using 34mm barSize):
-		// f.move(34, -17, 17**TODO:** Do!
-7mm, z=17mm
+		// f.move(34, -17, 17);
+    f.barY({ position: [0, 0, 0], length: 400 }); // a Y oriantated baris created at position x=34mm, y=-17mm, z=17mm
 f.pop();
 ```
 
@@ -98,9 +98,9 @@ To create a bar with an implizit definition, one can be created with a start and
 ```js
 f.push();
   f.moveGrid(1,-0.5,0.5);
-  let bar1 = f.barY({ position: [0,0,0], length: 400 }); // first horizontal bar
+  let bar1 = f.barY({ position: [0, 0, 0], length: 400 }); // first horizontal bar
   f.moveGrid(0,0,10);
-  let bar2 = f.barY({ position: [0,0,0], length: 400 }); // second horizontal bar
+  let bar2 = f.barY({ position: [0, 0, 0], length: 400 }); // second horizontal bar
 f.pop();
 
 f.push();
@@ -130,7 +130,7 @@ f.bar({position: bar1.pointFromStart(20), to: bar2.pointFromStart(20), extend: [
 The factory is also able to create panels, these are defined by size and thickness.
 
 ```js
-f.panel({position: [0,0,0], size: [300, 200], thickness: 30});
+f.panel({position: [0, 0, 0], size: [300, 200], thickness: 30});
 ```
 
 ![Panel](doc/panel.jpg)
@@ -143,7 +143,7 @@ The OPENJOYN source code is released under the AGPL 3.0
 
 ## Special Thanks
 
-Thanks to Prototype Fund & DLR (Deutsche Zentrum für Luft- und Raumfahrt).
+Thanks to Prototype Fund & DLR (Deutsches Zentrum für Luft- und Raumfahrt).
 Special thanks to [allesblinkt](https://allesblinkt.com/) for supporting the project and its idea! A big shout out to all the other individuals who are involved and thanks for their support!
 
 
