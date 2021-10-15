@@ -1,0 +1,45 @@
+{
+  "name": "open-joyn-core",
+  "description": "Core framework for the OPENJOYN project for parametric wood constructions.",
+  "homepage": "https://openjoyn.milz.studio",
+  "author": "Milz Studio",
+  "license": "AGPL",
+  "bugs": {
+    "url": "https://github.com/zlimcode/open-joyn/issues"
+  },
+  "version": "1.0.0",
+  "scripts": {
+    "build": "rollup -c && node makedocs.js",
+    "docs": "node makedocs.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zlimcode/open-joyn.git"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^17.0.0",
+    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^11.0.0",
+    "@rollup/plugin-typescript": "^8.0.0",
+    "rollup-plugin-terser": "^7.0.0",
+    "@ui-js/grok": "^1.3.0",
+    "rollup": "^2.3.4",
+    "ts-node": "^10.2.0",
+    "tslib": "^2.3.1",
+    "typescript": "^4.3.5"
+  },
+  "alias": {
+    "openjoyn/exec": "./src/exec/index.ts",
+    "openjoyn/model": "./src/model/index.ts",
+    "openjoyn/plan": "./src/plan/index.ts",
+    "openjoyn/style": "./src/style/index.ts",
+    "openjoyn/viewport": "./src/viewport/index.ts",
+    "three": {
+      "global": "THREE"
+    }
+  },
+  "dependencies": {
+    "@types/three": "^0.130.0",
+    "typedjson": "^1.7.0"
+  }
+}
