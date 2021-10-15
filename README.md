@@ -122,7 +122,7 @@ f.bar({position: bar1.pointFromStart(20), to: bar2.pointFromStart(20), extend: [
 
 ```
 
-![Bar from point to point, extended](doc/bar_from_to.jpg)
+![Bar from point to point, extended](doc/bar_from_to_extended.jpg)
 
 
 ### Create a Panel
