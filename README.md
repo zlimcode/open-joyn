@@ -6,6 +6,10 @@
 Our motivation for the OPENJOYN project is to explore methods of future design and build processes for digital and analog constructions. Therefore a bespoke language based on JavaScript is developed and utilized to parametrically define and customize wood constructions like furniture.
 
 
+**TODO:** Add screenshots of hosted tool!
+
+
+
 ## Our Main Goal
 
 Our vision is to enable common citizens to build individualized wood constructions. In addition to timeless products such as tables and cabinets, current socially relevant constructions can also get integrated. OPENJOYN is intended to develop into a construction catalog for the globally connected society and can achieve a high impact via a potentially large number of users.
@@ -20,6 +24,7 @@ It can be found here:
 ## How to try out the OPENJOYN JavaScript language
 
 **TODO:** Do!
+
 **TODO:** Add link to docs somewhere!
 
 
