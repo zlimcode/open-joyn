@@ -135,7 +135,7 @@ class SceneBuilder {
         this.connectorHighlightMaterial = makeHighlightMaterial(this.connectorStandardMaterial);
     }
 
-    makeMarkerObj(marker: Marker, options: ObjectOptions): THREE.Object3D {
+    makeMarkerObj(marker: Marker, _options: ObjectOptions): THREE.Object3D {
         const geo = new THREE.SphereGeometry(marker.radius, 8, 6);
 
         const mat = new THREE.MeshStandardMaterial({
