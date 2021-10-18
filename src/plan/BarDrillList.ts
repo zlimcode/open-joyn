@@ -1,8 +1,13 @@
 import type { Bar } from "openjoyn/model";
 import type { Plan } from "./Plan";
 
-import { groupByPredicate, naturalCompare } from "./helpers";
+import { groupByPredicate, naturalCompare, groupByEqual } from "./helpers";
 import type { BarHole } from "openjoyn/model/Bar";
+
+type BarDrillListBarGroup = {
+    template: Bar;
+    bars: Bar[];
+};
 
 type BarDrillListItem = {
     template: Bar;
@@ -11,7 +16,8 @@ type BarDrillListItem = {
     holesSide1Start: BarHole[],
     holesSide1End: BarHole[],
 
-    bars: Bar[];
+    bars: Bar[],
+    barsGroups: BarDrillListBarGroup[]
 };
 
 
@@ -28,9 +34,9 @@ class BarDrillList {
 
         barsWithHoles.sort((a, b) => naturalCompare(a.name, b.name));
 
-        const barsByName = groupByPredicate(barsWithHoles, (bar) => bar.name);
+        const equalBars = groupByEqual(barsWithHoles, (a, b) => a.equals(b));
 
-        let items = [...barsByName.entries()].map(([_name, bars]) => {
+        let items = equalBars.map((bars) => {
             const templateBar = bars[0];
 
             const holesSide0 = templateBar.holesOnSide(0);
@@ -41,13 +47,19 @@ class BarDrillList {
             const holesSide1Start = holesSide1.filter((hole) => hole.position <= templateBar.length / 2);
             const holesSide1End = holesSide1.filter((hole) => hole.position > templateBar.length / 2);
 
+            const barsByName = groupByPredicate(bars, (bar) => bar.name);
+            let grouped: BarDrillListBarGroup[] = [...barsByName.entries()].map(([_name, groupBars]) => { 
+                return {template: groupBars[0], bars: groupBars}
+            });
+
             return {
                 template: templateBar,
                 holesSide0Start: holesSide0Start,          // TODO: Consider the two other sides.
                 holesSide0End: holesSide0End,          // TODO: Consider the two other sides.
                 holesSide1Start: holesSide1Start,          // TODO: Consider the two other sides.
                 holesSide1End: holesSide1End,          // TODO: Consider the two other sides.
-                bars: bars,
+                barsGroups: grouped,
+                bars: bars
             };
         });
 
@@ -56,4 +68,4 @@ class BarDrillList {
 }
 
 export { BarDrillList };
-export type { BarDrillListItem };
+export type { BarDrillListItem, BarDrillListBarGroup };

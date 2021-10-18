@@ -342,6 +342,8 @@ class Bar extends PartBase {
     }
 
     equals(other: Bar) {
+        // ATTENTION: Does not compare name!
+
         if (!nearlyEqual(this.length, other.length)) {
             return false;
         }

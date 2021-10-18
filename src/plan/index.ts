@@ -7,7 +7,7 @@ import type { BarCutListItem } from "./BarCutList";
 import { PanelCutList } from "./PanelCutList";
 import type { PanelCutListItem } from "./PanelCutList";
 
-import { BarDrillList, BarDrillListItem } from "./BarDrillList";
+import { BarDrillList, BarDrillListItem, BarDrillListBarGroup } from "./BarDrillList";
 
 import { ShoppingList } from "./ShoppingList";
 import type { ShoppingListItem } from "./ShoppingList";
@@ -26,7 +26,7 @@ export { PanelCutList };
 export type { PanelCutListItem };
 
 export { BarDrillList };
-export type { BarDrillListItem };
+export type { BarDrillListItem, BarDrillListBarGroup };
 
 export { BarCutList };
 export type { BarCutListItem };
