@@ -165,7 +165,6 @@ class SceneBuilder {
         this.barInactiveMaterial = makeInactiveMaterial(this.barStandardMaterial);
         this.barHighlightMaterial = makeHighlightMaterial(this.barStandardMaterial);
 
-
         this.barHoleInactiveMaterial = makeInactiveMaterial(this.barHoleStandardMaterial);
         this.barHoleHighlightMaterial = makeHighlightMaterial(this.barHoleStandardMaterial);
 
@@ -247,7 +246,7 @@ class SceneBuilder {
         }
 
 
-        if (!options.omitHoles) {
+        if (!options.omitHoles && !options.inactive) {
             for (let hole of bar.holes) {
                 let exitHole = new BarHole(hole.position, (hole.side + 2) % 4, hole.diameter, hole.depth);
              

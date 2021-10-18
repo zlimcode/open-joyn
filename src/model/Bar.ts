@@ -318,6 +318,11 @@ class Bar extends PartBase {
             holes.forEach((hole) => {
                 hole.side = (hole.side + firstHoleSide) % 4;
             });
+
+            const quat = new THREE.Quaternion();
+            quat.setFromAxisAngle( new THREE.Vector3( 0, 0, 1 ), Math.PI * 0.5 * firstHoleSide);
+
+            this.rot.multiply(quat);
         }
 
         holes.forEach((hole) => {
