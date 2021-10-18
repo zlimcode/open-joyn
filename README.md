@@ -159,4 +159,3 @@ Education and Research from March 2021 to August 2021.
 ![BMBF_eng.png](doc/bmbf_eng.png)
 
 [https://openjoyn.milz.studio](https://openjoyn.milz.studio/)
->>>>>>> f036bcef3d405e6e801986c65319fbb1ce1df065
