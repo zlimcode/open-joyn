@@ -248,6 +248,17 @@ class Bar extends PartBase {
 
     /**
      * @ignore
+     * 
+     * @param side 
+     * @returns
+     */
+     sideLocalNormal(side: BarSide): THREE.Vector3 {
+        const sideNormalVec = SideUnitNormals[side].clone();
+        return sideNormalVec;
+    }
+
+    /**
+     * @ignore
      * Line on a side of a Bar
      * @returns a line from start to end
      */
