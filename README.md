@@ -27,13 +27,14 @@ It can be found here:
 
 ## How to try out the OPENJOYN JavaScript language
 
-**TODO:** Do!
+**TODO:** create chapter!
 
-**TODO:** Add link to docs somewhere!
+**TODO:** Add link to docs!
 
 
 
-### ...
+
+
 
 ## Examples
 
