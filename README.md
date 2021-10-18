@@ -16,10 +16,13 @@ Our vision is to enable common citizens to build individualized wood constructio
 
 By now everyone can access the construction catalog with a work-in-progress web tool we are hosting using the OPENJOYN JavaScript language!
 
-**TODO:** Add screenshots of hosted tool!
-
 It can be found here: 
+
 [http://openjoyn.milz.studio](http://openjoyn.milz.studio/)
+
+![A single bar](doc/tool_screenshot.jpg)
+
+
 
 
 ## How to try out the OPENJOYN JavaScript language
