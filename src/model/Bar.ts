@@ -248,6 +248,17 @@ class Bar extends PartBase {
 
     /**
      * @ignore
+     * 
+     * @param side 
+     * @returns
+     */
+     sideLocalNormal(side: BarSide): THREE.Vector3 {
+        const sideNormalVec = SideUnitNormals[side].clone();
+        return sideNormalVec;
+    }
+
+    /**
+     * @ignore
      * Line on a side of a Bar
      * @returns a line from start to end
      */
@@ -307,6 +318,11 @@ class Bar extends PartBase {
             holes.forEach((hole) => {
                 hole.side = (hole.side + firstHoleSide) % 4;
             });
+
+            const quat = new THREE.Quaternion();
+            quat.setFromAxisAngle( new THREE.Vector3( 0, 0, 1 ), Math.PI * 0.5 * firstHoleSide);
+
+            this.rot.multiply(quat);
         }
 
         holes.forEach((hole) => {

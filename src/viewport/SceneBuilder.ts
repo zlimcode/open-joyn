@@ -1,4 +1,4 @@
-import { Bar, Panel, Construction, Connector, PartBase, Marker, OverlapConnector } from "openjoyn/model";
+import { Bar, Panel, Construction, Connector, PartBase, Marker, OverlapConnector, BarHole } from "openjoyn/model";
 import { makeBevelBoxGeometry } from "./helpers";
 
 import * as THREE from "three";
@@ -28,6 +28,32 @@ function makeDebugLine(from: THREE.Vector3, to: THREE.Vector3, color?: string) {
     return line;
 }
 
+
+function makeBarHole(bar: Bar, hole: BarHole, mat: THREE.Material) {
+    let sideVec = bar.sideLocal(hole.side);
+    let sideNormal = bar.sideLocalNormal(hole.side);
+    let sideExtra = sideNormal.clone().multiplyScalar(0.1);     // Add distance from object to avoid z-fighting
+
+    sideVec.add(sideExtra);
+
+    let start = sideVec.clone();
+    start.z = hole.position;
+
+    const holeGeo = new THREE.CircleGeometry(hole.diameter * 0.5, 16);
+    const holeMat = mat;
+
+    const circle = new THREE.Mesh(holeGeo, holeMat);
+                    
+    let quat = new THREE.Quaternion();
+    quat.setFromUnitVectors(new THREE.Vector3(0, 0, 1), sideNormal);
+    circle.rotation.setFromQuaternion(quat);
+
+    circle.position.set(start.x, start.y, start.z);
+
+    return circle;
+}
+
+
 function makeInactiveMaterial(template: THREE.MeshStandardMaterial) {
     const mat = template.clone();
 
@@ -49,6 +75,7 @@ function makeHighlightMaterial(template: THREE.MeshStandardMaterial) {
 type ObjectOptions = {
     highlight?: boolean;
     inactive?: boolean;
+    omitHoles?: boolean;
 };
 
 
@@ -59,6 +86,10 @@ class SceneBuilder {
     barInactiveMaterial: THREE.MeshStandardMaterial;
     barHighlightMaterial: THREE.MeshStandardMaterial;
     barDebugMaterial: THREE.Material;
+
+    barHoleStandardMaterial: THREE.MeshStandardMaterial;
+    barHoleInactiveMaterial: THREE.MeshStandardMaterial;
+    barHoleHighlightMaterial: THREE.MeshStandardMaterial;
 
     connectorStandardMaterial: THREE.MeshStandardMaterial;
     connectorInactiveMaterial: THREE.MeshStandardMaterial;
@@ -82,7 +113,6 @@ class SceneBuilder {
                 // polygonOffsetFactor: 1
             });
 
-
         this.barDebugMaterial = new THREE.MeshStandardMaterial(
             {
                 color: debugColor,
@@ -92,7 +122,11 @@ class SceneBuilder {
 
             });
 
-
+        this.barHoleStandardMaterial = new THREE.MeshStandardMaterial(
+            {
+                color: 0x222222,
+            });
+    
         this.panelStandardMaterial = new THREE.MeshStandardMaterial(
             {
                 roughness: 0.25,
@@ -131,6 +165,9 @@ class SceneBuilder {
         this.barInactiveMaterial = makeInactiveMaterial(this.barStandardMaterial);
         this.barHighlightMaterial = makeHighlightMaterial(this.barStandardMaterial);
 
+        this.barHoleInactiveMaterial = makeInactiveMaterial(this.barHoleStandardMaterial);
+        this.barHoleHighlightMaterial = makeHighlightMaterial(this.barHoleStandardMaterial);
+
         this.connectorInactiveMaterial = makeInactiveMaterial(this.connectorStandardMaterial);
         this.connectorHighlightMaterial = makeHighlightMaterial(this.connectorStandardMaterial);
     }
@@ -159,12 +196,16 @@ class SceneBuilder {
         const geo = makeBevelBoxGeometry(bar.size, bar.length, bevelDefault);
 
         let mat: THREE.Material = this.barStandardMaterial;
+        let holeMat: THREE.Material = this.barHoleStandardMaterial;
 
         if (options.highlight) {
             mat = this.barHighlightMaterial;
+            holeMat = this.barHoleHighlightMaterial;
         } else if (options.inactive) {
             mat = this.barInactiveMaterial;
+            holeMat = this.barHoleInactiveMaterial;
         }
+
         mat = bar.debug ? this.barDebugMaterial : mat;
 
         const mesh = new THREE.Mesh(geo, mat);
@@ -204,6 +245,18 @@ class SceneBuilder {
             }
         }
 
+
+        if (!options.omitHoles && !options.inactive) {
+            for (let hole of bar.holes) {
+                let exitHole = new BarHole(hole.position, (hole.side + 2) % 4, hole.diameter, hole.depth);
+             
+                let holeMesh = makeBarHole(bar, hole, holeMat);
+                let exitHoleMesh = makeBarHole(bar, exitHole, holeMat);
+
+                obj.add(holeMesh);
+                obj.add(exitHoleMesh);
+            }
+        }
 
         // const edges = new THREE.EdgesGeometry(geo);
 
@@ -277,7 +330,6 @@ class SceneBuilder {
         }
         mat = connector.debug ? this.connectorDebugMaterial : mat;
 
-
         let throughCylGeo = new THREE.CylinderGeometry(5, 5, connector.length);
         const throughCylMesh = new THREE.Mesh(throughCylGeo, mat);
         throughCylMesh.rotateX(Math.PI * 0.5);
@@ -310,7 +362,7 @@ class SceneBuilder {
         return obj;
     }
 
-    makeSceneObj(part: PartBase, options: object): THREE.Object3D | undefined {
+    makeSceneObj(part: PartBase, options: ObjectOptions): THREE.Object3D | undefined {
         if (part instanceof Bar) {
             return this.makeBarObj(part, options);
         } else if (part instanceof Panel) {
