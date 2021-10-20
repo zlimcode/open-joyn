@@ -14,7 +14,7 @@ Our motivation for the OPENJOYN project is to explore methods of future design a
 
 Our vision is to enable common citizens to build individualized wood constructions. In addition to timeless products such as tables and cabinets, current socially relevant constructions can also get integrated. OPENJOYN is intended to develop into a construction catalog for the globally connected society and can achieve a high impact via a potentially large number of users.
 
-By now everyone can access the construction catalog with a work-in-progress web tool we are hosting using the OPENJOYN JavaScript language!
+By now everyone can access the construction catalog with a work-in-progress web tool we are hosting using the OPENJOYN JavaScript toolkit!
 
 It can be found here: 
 
@@ -25,14 +25,9 @@ It can be found here:
 
 
 
-## How to try out the OPENJOYN JavaScript language
+## The toolkit
 
-**TODO:** create chapter!
-
-**TODO:** Add link to docs!
-
-
-
+Besides using the hosted work-in-progress web tool [http://openjoyn.milz.studio](http://openjoyn.milz.studio/) it is possible to utilize the Factory and the toolkit Core in this repo. For details about the functionality please see the [docs](https://openjoyn.milz.studio/dev/docs).
 
 
 
@@ -120,7 +115,7 @@ f.pop();
 
 ### Extend bar on both sides
 
-The [f.bar](http://f.bar)() option "extend" allows to configure an overshoot of the bar at both ends individually.
+The f.bar() option "extend" allows to configure an overshoot of the bar at both ends individually.
 
 ```js
 f.bar({position: bar1.pointFromStart(20), to: bar2.pointFromStart(20), extend: [34, 34]});    
