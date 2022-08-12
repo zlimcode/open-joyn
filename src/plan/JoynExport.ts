@@ -47,6 +47,9 @@ class JoynConstruction {
     name: string = "";
 
     @jsonMember(String)
+    permalink: string = "";
+
+    @jsonMember(String)
     description: string = "";
 
     @jsonMember(String)
@@ -59,9 +62,14 @@ class JoynConstruction {
 
 class JoynExport {
     private plan: Plan;
+    private permalink?: string;
 
-    constructor(plan: Plan) {
+    constructor(plan: Plan, permalink?: string) {
         this.plan = plan;
+
+        if (permalink) {
+            this.permalink = permalink;
+        }
     }
 
     generate() {
@@ -105,6 +113,10 @@ class JoynExport {
 
                 jmConstruction.parts.push(jmPart);
             }
+        }
+
+        if (this.permalink) {
+            jmConstruction.permalink = this.permalink;
         }
 
         return jmConstruction;
