@@ -21,9 +21,9 @@
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^11.0.0",
     "@rollup/plugin-typescript": "^8.0.0",
-    "rollup-plugin-terser": "^7.0.0",
-    "@ui-js/grok": "^1.3.0",
+    "@ui-js/grok": "^1.8.0",
     "rollup": "^2.3.4",
+    "rollup-plugin-terser": "^7.0.0",
     "ts-node": "^10.2.0",
     "tslib": "^2.3.1",
     "typescript": "^4.3.5"
@@ -40,6 +40,6 @@
   },
   "dependencies": {
     "@types/three": "^0.130.0",
-    "typedjson": "^1.7.0"
+    "typedjson": "^1.8.0"
   }
 }
