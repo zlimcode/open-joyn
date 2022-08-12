@@ -23,6 +23,9 @@ abstract class PartBase {
     @jsonMember(Boolean)
     public debug: boolean = false;
 
+    @jsonMember(Number)
+    color?: number;
+
     constructor() {
         this.pos = new THREE.Vector3();
         this.rot = new THREE.Quaternion();

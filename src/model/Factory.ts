@@ -605,6 +605,10 @@ class Factory {
             part.debug = options.debug;
         }
 
+        if (options.color) {
+            part.color = options.color;
+        }
+
         let axis = options.axis ?? "z";
 
         switch (axis.toLocaleLowerCase()) {

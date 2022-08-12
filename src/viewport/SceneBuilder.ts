@@ -206,6 +206,13 @@ class SceneBuilder {
             holeMat = this.barHoleInactiveMaterial;
         }
 
+        if (!options.highlight) {
+            if (bar.color) {    // specialized material if custom color and not highlighted
+                mat = mat.clone();
+                mat.color = new THREE.Color(bar.color);
+            }
+        }
+
         mat = bar.debug ? this.barDebugMaterial : mat;
 
         const mesh = new THREE.Mesh(geo, mat);
@@ -306,6 +313,14 @@ class SceneBuilder {
         } else if (options.inactive) {
             mat = this.panelInactiveMaterial;
         }
+
+        if (!options.highlight) {
+            if (panel.color) {    // specialized material if custom color and not highlighted
+                mat = mat.clone();
+                mat.color = new THREE.Color(panel.color);
+            }
+        }
+
         mat = panel.debug ? this.panelDebugMaterial : mat;
 
         const mesh = new THREE.Mesh(geo, mat);
