@@ -177,7 +177,7 @@ class SceneBuilder {
 
         const mat = new THREE.MeshStandardMaterial({
             color: 0x000000,
-            emissive: marker.color ?? 0x0000ff
+            emissive: marker.color ? new THREE.Color(marker.color.r, marker.color.g, marker.color.b) : 0x0000ff
         });
 
         const mesh = new THREE.Mesh(geo, mat);
@@ -209,7 +209,7 @@ class SceneBuilder {
         if (!options.highlight) {
             if (bar.color) {    // specialized material if custom color and not highlighted
                 mat = mat.clone();
-                mat.color = new THREE.Color(bar.color);
+                mat.color = new THREE.Color(bar.color.r, bar.color.g, bar.color.b);
             }
         }
 
@@ -317,7 +317,7 @@ class SceneBuilder {
         if (!options.highlight) {
             if (panel.color) {    // specialized material if custom color and not highlighted
                 mat = mat.clone();
-                mat.color = new THREE.Color(panel.color);
+                mat.color = new THREE.Color(panel.color.r, panel.color.g, panel.color.b);
             }
         }
 

@@ -51,6 +51,9 @@ interface PartOptions {
 
     /** Draw the part highlighted in the preview */
     debug?: boolean;
+
+    /** Color as hex number or string. e.g. `0xff00ff` or `"#ff00ff`" */
+    color?: number | string;
 };
 
 
@@ -91,9 +94,6 @@ interface PanelOptions extends PartOptions {
 interface MarkerOptions extends PartOptions {
     /** Radius */
     radius?: number,
-
-    /** Color as hex number. e.g. `0xff00ff` */
-    color?: number;
 };
 
 
@@ -260,7 +260,7 @@ class Factory {
     marker(options: MarkerOptions) {
         let opts = { ...this.defaults.marker, ...options };
 
-        let marker = new Marker(opts.radius!, opts.color);
+        let marker = new Marker(opts.radius!);
 
         this.finalizeAndAddPart(marker, opts);
         return marker;
@@ -606,7 +606,7 @@ class Factory {
         }
 
         if (options.color) {
-            part.color = options.color;
+            part.color = new THREE.Color(options.color);
         }
 
         let axis = options.axis ?? "z";

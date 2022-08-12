@@ -23,8 +23,8 @@ abstract class PartBase {
     @jsonMember(Boolean)
     public debug: boolean = false;
 
-    @jsonMember(Number)
-    color?: number;
+    @jsonMember(THREE.Color)
+    color?: THREE.Color;
 
     constructor() {
         this.pos = new THREE.Vector3();
