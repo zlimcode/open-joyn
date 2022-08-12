@@ -49,6 +49,9 @@ interface PartOptions {
      */
     axis?: Axis,
 
+    /** Angle to rotate the part around its main axis */
+    roll?: number,
+
     /** Draw the part highlighted in the preview */
     debug?: boolean;
 
@@ -610,6 +613,7 @@ class Factory {
         }
 
         let axis = options.axis ?? "z";
+        let roll = options.roll ?? 0.0;         // TODO: implement
 
         switch (axis.toLocaleLowerCase()) {
             case "x":
@@ -624,6 +628,7 @@ class Factory {
 
             case "z":
             case "+z":
+                part.rot.setFromAxisAngle(new THREE.Vector3(1, 0, 0), 0); // TODO: is this necessary?
                 break;
 
             case "-x":
@@ -648,6 +653,10 @@ class Factory {
 
         let transPos = new THREE.Vector3(...pos);
         transPos.applyMatrix4(this.currentMatrix());
+
+        // part.rot.
+
+        // this.curren
         part.pos = transPos;
         part.group = this.currentGroup;
 
