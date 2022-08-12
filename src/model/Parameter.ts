@@ -20,7 +20,7 @@ interface ParameterOptions {
     name: string;
 
     /** Default value. Also determines type. */
-    value: number | boolean | string;
+    value: number | boolean | string | null;
 
     /** Label to display in the UI. */
     label?: string;
@@ -97,6 +97,10 @@ class Parameter implements ParameterOptions {
 
     labelOrName(): string {
         return this.label ?? this.name;
+    }
+
+    isEmpty() {
+        return typeof this.value == "null" || typeof this.value == "undefined";
     }
 
     isNumeric() {
