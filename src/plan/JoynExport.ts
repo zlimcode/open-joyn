@@ -91,7 +91,6 @@ class JoynExport {
                 jmPart.stock = bar.size;
                 jmPart.skeletonLength = bar.length;
 
-
                 for (const hole of bar.holes) {
                     let joint = new JoynJointInstance();
 
@@ -107,7 +106,6 @@ class JoynExport {
                 jmConstruction.parts.push(jmPart);
             }
         }
-
 
         return jmConstruction;
     }
