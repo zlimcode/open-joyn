@@ -74,7 +74,8 @@ class Plan {
     groupConnectorsByLength(connectors: Connector[]) {
         connectors.sort((a, b) => a.length - b.length);
 
-        const connectorsByLength = groupByPredicate(connectors, (connector) => fixedPrecision(connector.length, 10));       // TODO: connector configurable
+        const connectorsByLength = groupByPredicate(connectors, (connector) => fixedPrecision(connector.length, 0));       // TODO: connector configurable
+
         return [...connectorsByLength.values()];
     }
 
