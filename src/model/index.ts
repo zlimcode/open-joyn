@@ -37,5 +37,5 @@ export { Construction, Meta, Parameter, Factory, Step };
 export { PartBase, Connector, ButtConnector, OverlapConnector, Marker, Bar, Panel };
 export { BarHole };
 
-export { log, map, mapConstrain, constrain } from "./helpers";
+export { log, map, mapConstrain, constrain, radians, degrees } from "./helpers";
 export type { vec2, vec3 };

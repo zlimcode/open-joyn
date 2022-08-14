@@ -63,6 +63,24 @@ function constrain(v: number, min: number, max: number) {
 };
 
 /**
+ * Convert value from radians to degrees
+ * @param v angle in radians
+ * @returns angle in degrees
+ */
+function degrees(v: number) {
+    return v / Math.PI * 180.0;
+}
+
+/**
+ * Convert value from degrees to radians
+ * @param v angle in degrees
+ * @returns angle in radians
+ */
+function radians(v: number) {
+    return v / 180.0 * Math.PI;
+}
+
+/**
  * For now just a wrapper around `console.log` to print messages to the development console
  * @param args 
  */
@@ -104,4 +122,4 @@ function toVector2(v: vec2): THREE.Vector2 {
 // };
 
 
-export { log, pairs, map, mapConstrain, constrain, toVector2, toVector3 };
+export { log, pairs, map, mapConstrain, constrain, radians, degrees, toVector2, toVector3 };
