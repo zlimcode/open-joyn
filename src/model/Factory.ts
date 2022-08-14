@@ -630,7 +630,7 @@ class Factory {
     
                 case "z":
                 case "+z":
-                    // part.rot.setFromAxisAngle(new THREE.Vector3(1, 0, 0), 0); // TODO: is this necessary?
+                    part.rot.setFromAxisAngle(new THREE.Vector3(1, 0, 0), 0.0);
                     break;
     
                 case "-x":
