@@ -616,39 +616,48 @@ class Factory {
         let axis = options.axis ?? "z";
         let roll = options.roll ?? 0.0;         // TODO: implement
 
+        let rollQuat = new THREE.Quaternion();
+        rollQuat.setFromAxisAngle(new THREE.Vector3(0, 0, 1), roll);
+
+        let quat = new THREE.Quaternion();
+
         if (setRotation) {
             switch (axis.toLocaleLowerCase()) {
                 case "x":
                 case "+x":
-                    part.rot.setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI * 0.5);
+                    quat.setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI * 0.5);
                     break;
     
                 case "y":
                 case "+y":
-                    part.rot.setFromAxisAngle(new THREE.Vector3(-1, 0, 0), Math.PI * 0.5);
+                    quat.setFromAxisAngle(new THREE.Vector3(-1, 0, 0), Math.PI * 0.5);
                     break;
     
                 case "z":
                 case "+z":
-                    part.rot.setFromAxisAngle(new THREE.Vector3(1, 0, 0), 0.0);
+                    quat.setFromAxisAngle(new THREE.Vector3(1, 0, 0), 0.0);
                     break;
     
                 case "-x":
-                    part.rot.setFromAxisAngle(new THREE.Vector3(0, 1, 0), -Math.PI * 0.5);
+                    quat.setFromAxisAngle(new THREE.Vector3(0, 1, 0), -Math.PI * 0.5);
                     break;
     
                 case "-y":
-                    part.rot.setFromAxisAngle(new THREE.Vector3(-1, 0, 0), -Math.PI * 0.5);
+                    quat.setFromAxisAngle(new THREE.Vector3(-1, 0, 0), -Math.PI * 0.5);
                     break;
     
                 case "-z":
-                    part.rot.setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI);
+                    quat.setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI);
                     break;
     
                 default:
                     throw new Error(`Unkown axis ${axis}`);
             }
+
+            part.rot.copy(quat);
         }
+
+        part.rot.multiplyQuaternions(part.rot, rollQuat);
 
         // TODO: take rotation of global matrix into account
 
