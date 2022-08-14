@@ -265,7 +265,7 @@ class Factory {
 
         let marker = new Marker(opts.radius!);
 
-        this.finalizeAndAddPart(marker, opts);
+        this.finalizeAndAddPart(marker, opts, true);
         return marker;
     }
 
@@ -322,7 +322,7 @@ class Factory {
         let thickness = Math.abs(opts.thickness!);
 
         let panel = new Panel(thickness, opts.size!);
-        this.finalizeAndAddPart(panel, opts);
+        this.finalizeAndAddPart(panel, opts, true);
         return panel;
     }
 
@@ -352,9 +352,10 @@ class Factory {
             let to = opts.to;
 
             bar = Bar.betweenTwoPoints(pos, to, opts.size!);
+            this.finalizeAndAddPart(bar, opts, false);
+        } else {
+            this.finalizeAndAddPart(bar, opts, true);
         }
-
-        this.finalizeAndAddPart(bar, opts);
 
         if (opts.extend) {
             bar.length = bar.length + opts.extend[0] + opts.extend[1];
@@ -513,7 +514,7 @@ class Factory {
             }
 
             const connector = new OverlapConnector(length, parts);
-            this.finalizeAndAddPart(connector, { position: posFirst, debug: opts.debug });
+            this.finalizeAndAddPart(connector, { position: posFirst, debug: opts.debug }, true);
             connector.rot.setFromUnitVectors(new THREE.Vector3(0, 0, 1), delta.normalize());
         }
 
@@ -532,7 +533,7 @@ class Factory {
             }
 
             const connector = new ButtConnector(length, [butt.a, butt.b]);
-            this.finalizeAndAddPart(connector, { position: posSecond, debug: opts.debug });
+            this.finalizeAndAddPart(connector, { position: posSecond, debug: opts.debug }, true);
             connector.rot.setFromUnitVectors(new THREE.Vector3(0, 0, 1), delta.normalize());
 
             // Make holes (one per bar)
@@ -596,7 +597,7 @@ class Factory {
         return overlapSituations;
     }
 
-    private finalizeAndAddPart(part: PartBase, options: PartOptions) {
+    private finalizeAndAddPart(part: PartBase, options: PartOptions, setRotation: boolean) {
         // TODO: from default style
         // TODO: use typedjson to validate??
 
@@ -615,36 +616,38 @@ class Factory {
         let axis = options.axis ?? "z";
         let roll = options.roll ?? 0.0;         // TODO: implement
 
-        switch (axis.toLocaleLowerCase()) {
-            case "x":
-            case "+x":
-                part.rot.setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI * 0.5);
-                break;
-
-            case "y":
-            case "+y":
-                part.rot.setFromAxisAngle(new THREE.Vector3(-1, 0, 0), Math.PI * 0.5);
-                break;
-
-            case "z":
-            case "+z":
-                part.rot.setFromAxisAngle(new THREE.Vector3(1, 0, 0), 0); // TODO: is this necessary?
-                break;
-
-            case "-x":
-                part.rot.setFromAxisAngle(new THREE.Vector3(0, 1, 0), -Math.PI * 0.5);
-                break;
-
-            case "-y":
-                part.rot.setFromAxisAngle(new THREE.Vector3(-1, 0, 0), -Math.PI * 0.5);
-                break;
-
-            case "-z":
-                part.rot.setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI);
-                break;
-
-            default:
-                throw new Error(`Unkown axis ${axis}`);
+        if (setRotation) {
+            switch (axis.toLocaleLowerCase()) {
+                case "x":
+                case "+x":
+                    part.rot.setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI * 0.5);
+                    break;
+    
+                case "y":
+                case "+y":
+                    part.rot.setFromAxisAngle(new THREE.Vector3(-1, 0, 0), Math.PI * 0.5);
+                    break;
+    
+                case "z":
+                case "+z":
+                    // part.rot.setFromAxisAngle(new THREE.Vector3(1, 0, 0), 0); // TODO: is this necessary?
+                    break;
+    
+                case "-x":
+                    part.rot.setFromAxisAngle(new THREE.Vector3(0, 1, 0), -Math.PI * 0.5);
+                    break;
+    
+                case "-y":
+                    part.rot.setFromAxisAngle(new THREE.Vector3(-1, 0, 0), -Math.PI * 0.5);
+                    break;
+    
+                case "-z":
+                    part.rot.setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI);
+                    break;
+    
+                default:
+                    throw new Error(`Unkown axis ${axis}`);
+            }
         }
 
         // TODO: take rotation of global matrix into account
