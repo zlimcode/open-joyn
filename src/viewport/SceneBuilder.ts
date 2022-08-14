@@ -85,7 +85,7 @@ class SceneBuilder {
     barStandardMaterial: THREE.MeshStandardMaterial;
     barInactiveMaterial: THREE.MeshStandardMaterial;
     barHighlightMaterial: THREE.MeshStandardMaterial;
-    barDebugMaterial: THREE.Material;
+    barDebugMaterial: THREE.MeshStandardMaterial;
 
     barHoleStandardMaterial: THREE.MeshStandardMaterial;
     barHoleInactiveMaterial: THREE.MeshStandardMaterial;
@@ -99,7 +99,7 @@ class SceneBuilder {
     panelStandardMaterial: THREE.MeshStandardMaterial;
     panelInactiveMaterial: THREE.MeshStandardMaterial;
     panelHighlightMaterial: THREE.MeshStandardMaterial;
-    panelDebugMaterial: THREE.Material;
+    panelDebugMaterial: THREE.MeshStandardMaterial;
 
     constructor(construction: Construction) {
         this.construction = construction;
@@ -195,8 +195,8 @@ class SceneBuilder {
     makeBarObj(bar: Bar, options: ObjectOptions): THREE.Object3D {
         const geo = makeBevelBoxGeometry(bar.size, bar.length, bevelDefault);
 
-        let mat: THREE.Material = this.barStandardMaterial;
-        let holeMat: THREE.Material = this.barHoleStandardMaterial;
+        let mat: THREE.MeshStandardMaterial = this.barStandardMaterial;
+        let holeMat: THREE.MeshStandardMaterial = this.barHoleStandardMaterial;
 
         if (options.highlight) {
             mat = this.barHighlightMaterial;
@@ -306,7 +306,7 @@ class SceneBuilder {
     makePanelObj(panel: Panel, options: ObjectOptions): THREE.Object3D {
         const geo = makeBevelBoxGeometry(panel.size, panel.thickness, bevelDefault, bevelDefault);
 
-        let mat: THREE.Material = this.panelStandardMaterial;
+        let mat: THREE.MeshStandardMaterial = this.panelStandardMaterial;
 
         if (options.highlight) {
             mat = this.panelHighlightMaterial;
@@ -336,7 +336,7 @@ class SceneBuilder {
     }
 
     makeConnectorObj(connector: Connector, options: ObjectOptions): THREE.Object3D {
-        let mat: THREE.Material = this.connectorStandardMaterial;
+        let mat: THREE.MeshStandardMaterial = this.connectorStandardMaterial;
 
         if (options.highlight) {
             mat = this.connectorHighlightMaterial;
