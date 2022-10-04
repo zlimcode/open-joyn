@@ -38,6 +38,14 @@ class Plan {
         return this.construction.panels().length > 0;
     }
 
+    stepForGroupName(groupName: string) {
+        return this.steps.find(s => s.groupName == groupName);
+    }
+
+    stepIndexForGroupName(groupName: string) {
+        return this.steps.findIndex(s => s.groupName == groupName);
+    }
+
 
     groupPanelsByThickness(panels: Panel[]) {
         panels.sort((a, b) => a.thickness - b.thickness);

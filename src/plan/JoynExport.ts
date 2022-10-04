@@ -93,7 +93,11 @@ class JoynExport {
         for (const group of barsByName.values()) {
             for (let barIdx = 0; barIdx < group.length; barIdx++) {
                 const bar = group[barIdx];
-                const name = `${bar.name}_${barIdx + 1}`;
+                const groupName = bar.group;
+                const stepIndex = this.plan.stepIndexForGroupName(groupName);
+                const stepName = `Step ${stepIndex + 1}`;
+
+                const name = `[${stepName}] ${bar.name}_${barIdx + 1}`;
 
                 let jmPart = new JoynPart();
                 jmPart.name = name;
