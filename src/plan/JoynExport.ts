@@ -84,6 +84,7 @@ class JoynExport {
         const jmConstruction = new JoynConstruction();
 
         jmConstruction.name = meta.name;
+        jmConstruction.style = "10_scarf";   // TODO: to config
 
         if (meta.description) {
             jmConstruction.description = meta.description;
