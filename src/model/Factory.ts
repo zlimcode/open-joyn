@@ -497,7 +497,7 @@ class Factory {
                 conn.a.addHole(conn.posA, (conn.sideA + 2) % 4, opts.overlapHoleDia!);
 
                 if (i == situation.length - 1) {
-                    conn.b.addHole(conn.posB, conn.sideB, opts.overlapHoleDia!);
+                    conn.b.addHole(conn.posB, (conn.sideB + 2) % 4, opts.overlapHoleDia!);
                 }
             }
 
