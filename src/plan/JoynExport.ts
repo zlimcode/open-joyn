@@ -83,8 +83,8 @@ class JoynExport {
 
         const jmConstruction = new JoynConstruction();
 
-        jmConstruction.name = meta.name;
-        
+        jmConstruction.name = this.plan.options.name;
+       
         jmConstruction.style = this.plan.style.joynExport.constructionStyle;
 
         if (meta.description) {
