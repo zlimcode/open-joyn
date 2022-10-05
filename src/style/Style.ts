@@ -15,13 +15,19 @@ interface Style {
 
         /* Material for each cut, mm */
         stockCutExtra: number;
+
+        /* Do not allow reordering of holes on opposite sides */
+        keepHoleSide: boolean;
     };
 
     connections: {
         stock: string;
 
+    };
 
-
+    joynExport: {
+        constructionStyle: string;
+        jointTemplate: string;
     };
 
     /** Precision for display and grouping. -1 = centimeters, 0 = whole millimeters, 1 = tenth of a millimeter */
