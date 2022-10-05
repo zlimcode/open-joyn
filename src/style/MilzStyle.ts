@@ -1,6 +1,7 @@
 import type Style from "./Style";
 
 let MilzStyle: Style = {
+    experimental: false,
 
     bars: {
         stock: "spruce_quadratic",

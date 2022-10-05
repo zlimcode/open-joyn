@@ -1,6 +1,7 @@
 import type Style from "./Style";
 
 let FlatheadStyle: Style = {
+    experimental: true,
 
     bars: {
         stock: "spruce_quadratic",

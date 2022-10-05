@@ -1,5 +1,7 @@
 
 interface Style {
+    experimental: boolean,
+
     panels: {
         stock: string;
 
