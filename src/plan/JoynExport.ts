@@ -84,7 +84,8 @@ class JoynExport {
         const jmConstruction = new JoynConstruction();
 
         jmConstruction.name = meta.name;
-        jmConstruction.style = "10_scarf";   // TODO: to config
+        
+        jmConstruction.style = this.plan.style.joynExport.constructionStyle;
 
         if (meta.description) {
             jmConstruction.description = meta.description;
@@ -107,8 +108,7 @@ class JoynExport {
                 for (const hole of bar.holes) {
                     let joint = new JoynJointInstance();
 
-                    joint.template = "34x34_fullpeg";  // TODO: to config
-
+                    joint.template = this.plan.style.joynExport.jointTemplate;
                     joint.side = hole.side;
                     joint.position = -hole.position;
                     // joint.rotation
