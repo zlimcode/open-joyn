@@ -21,7 +21,7 @@ let FlatheadStyle: Style = {
 
     joynExport: {
         constructionStyle: "10_scarf",
-        jointTemplate: "34x34_flathead"
+        jointTemplate: "34x34_fullpeg_flathead"
     },
 
     precision: 0
