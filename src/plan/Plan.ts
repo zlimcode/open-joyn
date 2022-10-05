@@ -129,7 +129,7 @@ class Plan {
 
         // TODO: should construction be mutated?
         for (const bar of construction.bars()) {
-            bar.normalize();
+            bar.normalize(style.bars.keepHoleSide);
         }
 
         let barsByGroups = construction.barsByGroups(steps.map((step) => step.groupName));
