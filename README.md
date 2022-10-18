@@ -30,6 +30,8 @@ It can be found here:
 Besides using the hosted work-in-progress web tool [http://openjoyn.milz.studio](http://openjoyn.milz.studio/) it is possible to utilize the Factory and the toolkit Core in this repo. For details about the functionality please see the [docs](https://openjoyn.milz.studio/dev/docs).
 
 
+## OPENJOYN CIRCULAR
+The "CIRCULAR" module is adding new features to the OPENJOYN tool to give the user a variety of options for using present construction materials. For example, individual bespoke slats can be defined and used in parametric definitions. 
 
 ## Examples
 
