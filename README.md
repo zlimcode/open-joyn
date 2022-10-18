@@ -151,8 +151,7 @@ Special thanks to [allesblinkt](https://allesblinkt.com/) for supporting the pro
 
 ## Funding
 
-Sponsored through the Prototype Fund by the German Federal Ministry of
-Education and Research from March 2021 to August 2021.
+The project was funded by the German Federal Ministry of Education and Research under grant number 01IS21S22 from March to August 2021, and under grant number 01IS22S02 from March to August 2022. The authors are responsible for the content of this publication.
 
 ![BMBF_eng.png](doc/bmbf_eng.png)
 
