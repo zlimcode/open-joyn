@@ -303,7 +303,7 @@ class Bar extends PartBase {
         return nearlyEqual(this.size[0], this.size[1]);
     }
 
-    normalize() {
+    normalize(keepHoleSide: boolean) {
         // TODO: reverse or not
 
         // let newHoles = this.holes.map((hole) => {
@@ -326,8 +326,9 @@ class Bar extends PartBase {
         }
 
         holes.forEach((hole) => {
-            if (hole.depth == undefined && hole.side > 1) {  // flip side of hole, if it's a through hole
+            if (!keepHoleSide && hole.depth == undefined && hole.side > 1) {  // flip side of hole, if it's a through hole
                 hole.side = (hole.side + 2) % 4;
+                console.log("Reaordeeerrr!!!");
             }
         });
 

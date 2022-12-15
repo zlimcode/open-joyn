@@ -1,13 +1,13 @@
 import type Style from "./Style";
 
-let MilzStyle: Style = {
-    experimental: false,
+let FlatheadStyle: Style = {
+    experimental: true,
 
     bars: {
         stock: "spruce_quadratic",
         stockLength: 3000.0,
         stockCutExtra: 5.0,
-        keepHoleSide: false,
+        keepHoleSide: true,
     },
 
     panels: {
@@ -21,10 +21,10 @@ let MilzStyle: Style = {
 
     joynExport: {
         constructionStyle: "10_scarf",
-        jointTemplate: "34x34_fullpeg"
+        jointTemplate: "34x34_fullpeg_flathead"
     },
 
     precision: 0
 };
 
-export default MilzStyle;
+export default FlatheadStyle;

@@ -85,7 +85,7 @@ class SceneBuilder {
     barStandardMaterial: THREE.MeshStandardMaterial;
     barInactiveMaterial: THREE.MeshStandardMaterial;
     barHighlightMaterial: THREE.MeshStandardMaterial;
-    barDebugMaterial: THREE.Material;
+    barDebugMaterial: THREE.MeshStandardMaterial;
 
     barHoleStandardMaterial: THREE.MeshStandardMaterial;
     barHoleInactiveMaterial: THREE.MeshStandardMaterial;
@@ -99,7 +99,7 @@ class SceneBuilder {
     panelStandardMaterial: THREE.MeshStandardMaterial;
     panelInactiveMaterial: THREE.MeshStandardMaterial;
     panelHighlightMaterial: THREE.MeshStandardMaterial;
-    panelDebugMaterial: THREE.Material;
+    panelDebugMaterial: THREE.MeshStandardMaterial;
 
     constructor(construction: Construction) {
         this.construction = construction;
@@ -177,7 +177,7 @@ class SceneBuilder {
 
         const mat = new THREE.MeshStandardMaterial({
             color: 0x000000,
-            emissive: marker.color ?? 0x0000ff
+            emissive: marker.color ? new THREE.Color(marker.color.r, marker.color.g, marker.color.b) : 0x0000ff
         });
 
         const mesh = new THREE.Mesh(geo, mat);
@@ -195,8 +195,8 @@ class SceneBuilder {
     makeBarObj(bar: Bar, options: ObjectOptions): THREE.Object3D {
         const geo = makeBevelBoxGeometry(bar.size, bar.length, bevelDefault);
 
-        let mat: THREE.Material = this.barStandardMaterial;
-        let holeMat: THREE.Material = this.barHoleStandardMaterial;
+        let mat: THREE.MeshStandardMaterial = this.barStandardMaterial;
+        let holeMat: THREE.MeshStandardMaterial = this.barHoleStandardMaterial;
 
         if (options.highlight) {
             mat = this.barHighlightMaterial;
@@ -204,6 +204,13 @@ class SceneBuilder {
         } else if (options.inactive) {
             mat = this.barInactiveMaterial;
             holeMat = this.barHoleInactiveMaterial;
+        }
+
+        if (!options.highlight) {
+            if (bar.color) {    // specialized material if custom color and not highlighted
+                mat = mat.clone();
+                mat.color = new THREE.Color(bar.color.r, bar.color.g, bar.color.b);
+            }
         }
 
         mat = bar.debug ? this.barDebugMaterial : mat;
@@ -299,13 +306,21 @@ class SceneBuilder {
     makePanelObj(panel: Panel, options: ObjectOptions): THREE.Object3D {
         const geo = makeBevelBoxGeometry(panel.size, panel.thickness, bevelDefault, bevelDefault);
 
-        let mat: THREE.Material = this.panelStandardMaterial;
+        let mat: THREE.MeshStandardMaterial = this.panelStandardMaterial;
 
         if (options.highlight) {
             mat = this.panelHighlightMaterial;
         } else if (options.inactive) {
             mat = this.panelInactiveMaterial;
         }
+
+        if (!options.highlight) {
+            if (panel.color) {    // specialized material if custom color and not highlighted
+                mat = mat.clone();
+                mat.color = new THREE.Color(panel.color.r, panel.color.g, panel.color.b);
+            }
+        }
+
         mat = panel.debug ? this.panelDebugMaterial : mat;
 
         const mesh = new THREE.Mesh(geo, mat);
@@ -321,7 +336,7 @@ class SceneBuilder {
     }
 
     makeConnectorObj(connector: Connector, options: ObjectOptions): THREE.Object3D {
-        let mat: THREE.Material = this.connectorStandardMaterial;
+        let mat: THREE.MeshStandardMaterial = this.connectorStandardMaterial;
 
         if (options.highlight) {
             mat = this.connectorHighlightMaterial;

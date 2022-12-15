@@ -1,7 +1,7 @@
 import { Construction, Factory } from "openjoyn/model";
 // import type { ExecutionError } from "./Error";
 
-type GenerateFnType = (factory: Factory, parameters: object) => Construction;
+type GenerateFnType = (factory: Factory, parameters: object, preview: boolean) => Construction;
 
 
 class DirectExecutor {
@@ -15,10 +15,10 @@ class DirectExecutor {
         this.buildFn = build;
     }
 
-    generate(values: object) {
+    generate(values: object, preview: boolean) {
         let factory = new Factory();
 
-        this.buildFn(factory, values);
+        this.buildFn(factory, values, preview);
 
         return factory.construction;
     }

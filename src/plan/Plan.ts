@@ -38,6 +38,14 @@ class Plan {
         return this.construction.panels().length > 0;
     }
 
+    stepForGroupName(groupName: string) {
+        return this.steps.find(s => s.groupName == groupName);
+    }
+
+    stepIndexForGroupName(groupName: string) {
+        return this.steps.findIndex(s => s.groupName == groupName);
+    }
+
 
     groupPanelsByThickness(panels: Panel[]) {
         panels.sort((a, b) => a.thickness - b.thickness);
@@ -74,7 +82,8 @@ class Plan {
     groupConnectorsByLength(connectors: Connector[]) {
         connectors.sort((a, b) => a.length - b.length);
 
-        const connectorsByLength = groupByPredicate(connectors, (connector) => fixedPrecision(connector.length, 10));       // TODO: connector configurable
+        const connectorsByLength = groupByPredicate(connectors, (connector) => fixedPrecision(connector.length, 0));       // TODO: connector configurable
+
         return [...connectorsByLength.values()];
     }
 
@@ -120,7 +129,7 @@ class Plan {
 
         // TODO: should construction be mutated?
         for (const bar of construction.bars()) {
-            bar.normalize();
+            bar.normalize(style.bars.keepHoleSide);
         }
 
         let barsByGroups = construction.barsByGroups(steps.map((step) => step.groupName));

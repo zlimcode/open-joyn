@@ -25,8 +25,8 @@ class IframeExecutor {
         this.sendMessage({ cmd: "commit", code: userCode });
     }
 
-    generate(values: object) {
-        this.sendMessage({ cmd: "generate", values: values });
+    generate(values: object, preview: boolean) {
+        this.sendMessage({ cmd: "generate", values: values, preview: preview });
     }
 
     private handleMetaMessage(metaJson: object) {

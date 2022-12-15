@@ -11,13 +11,9 @@ class Marker extends PartBase {
     @jsonMember(Number)
     radius: number;
 
-    @jsonMember(Number)
-    color?: number;
-
-    constructor(radius: number, color?: number) {
+    constructor(radius: number) {
         super();
         this.radius = radius;
-        this.color = color;
     }
 }
 

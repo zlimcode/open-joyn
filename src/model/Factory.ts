@@ -49,8 +49,14 @@ interface PartOptions {
      */
     axis?: Axis,
 
+    /** Angle to rotate the part around its main axis */
+    roll?: number,
+
     /** Draw the part highlighted in the preview */
     debug?: boolean;
+
+    /** Color as hex number or string. e.g. `0xff00ff` or `"#ff00ff`" */
+    color?: number | string;
 };
 
 
@@ -91,9 +97,6 @@ interface PanelOptions extends PartOptions {
 interface MarkerOptions extends PartOptions {
     /** Radius */
     radius?: number,
-
-    /** Color as hex number. e.g. `0xff00ff` */
-    color?: number;
 };
 
 
@@ -260,9 +263,9 @@ class Factory {
     marker(options: MarkerOptions) {
         let opts = { ...this.defaults.marker, ...options };
 
-        let marker = new Marker(opts.radius!, opts.color);
+        let marker = new Marker(opts.radius!);
 
-        this.finalizeAndAddPart(marker, opts);
+        this.finalizeAndAddPart(marker, opts, true);
         return marker;
     }
 
@@ -319,7 +322,7 @@ class Factory {
         let thickness = Math.abs(opts.thickness!);
 
         let panel = new Panel(thickness, opts.size!);
-        this.finalizeAndAddPart(panel, opts);
+        this.finalizeAndAddPart(panel, opts, true);
         return panel;
     }
 
@@ -349,9 +352,10 @@ class Factory {
             let to = opts.to;
 
             bar = Bar.betweenTwoPoints(pos, to, opts.size!);
+            this.finalizeAndAddPart(bar, opts, false);
+        } else {
+            this.finalizeAndAddPart(bar, opts, true);
         }
-
-        this.finalizeAndAddPart(bar, opts);
 
         if (opts.extend) {
             bar.length = bar.length + opts.extend[0] + opts.extend[1];
@@ -493,7 +497,7 @@ class Factory {
                 conn.a.addHole(conn.posA, (conn.sideA + 2) % 4, opts.overlapHoleDia!);
 
                 if (i == situation.length - 1) {
-                    conn.b.addHole(conn.posB, conn.sideB, opts.overlapHoleDia!);
+                    conn.b.addHole(conn.posB, (conn.sideB + 2) % 4, opts.overlapHoleDia!);
                 }
             }
 
@@ -510,7 +514,7 @@ class Factory {
             }
 
             const connector = new OverlapConnector(length, parts);
-            this.finalizeAndAddPart(connector, { position: posFirst, debug: opts.debug });
+            this.finalizeAndAddPart(connector, { position: posFirst, debug: opts.debug }, true);
             connector.rot.setFromUnitVectors(new THREE.Vector3(0, 0, 1), delta.normalize());
         }
 
@@ -529,7 +533,7 @@ class Factory {
             }
 
             const connector = new ButtConnector(length, [butt.a, butt.b]);
-            this.finalizeAndAddPart(connector, { position: posSecond, debug: opts.debug });
+            this.finalizeAndAddPart(connector, { position: posSecond, debug: opts.debug }, true);
             connector.rot.setFromUnitVectors(new THREE.Vector3(0, 0, 1), delta.normalize());
 
             // Make holes (one per bar)
@@ -593,7 +597,7 @@ class Factory {
         return overlapSituations;
     }
 
-    private finalizeAndAddPart(part: PartBase, options: PartOptions) {
+    private finalizeAndAddPart(part: PartBase, options: PartOptions, setRotation: boolean) {
         // TODO: from default style
         // TODO: use typedjson to validate??
 
@@ -605,38 +609,55 @@ class Factory {
             part.debug = options.debug;
         }
 
-        let axis = options.axis ?? "z";
-
-        switch (axis.toLocaleLowerCase()) {
-            case "x":
-            case "+x":
-                part.rot.setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI * 0.5);
-                break;
-
-            case "y":
-            case "+y":
-                part.rot.setFromAxisAngle(new THREE.Vector3(-1, 0, 0), Math.PI * 0.5);
-                break;
-
-            case "z":
-            case "+z":
-                break;
-
-            case "-x":
-                part.rot.setFromAxisAngle(new THREE.Vector3(0, 1, 0), -Math.PI * 0.5);
-                break;
-
-            case "-y":
-                part.rot.setFromAxisAngle(new THREE.Vector3(-1, 0, 0), -Math.PI * 0.5);
-                break;
-
-            case "-z":
-                part.rot.setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI);
-                break;
-
-            default:
-                throw new Error(`Unkown axis ${axis}`);
+        if (options.color) {
+            part.color = new THREE.Color(options.color);
         }
+
+        let axis = options.axis ?? "z";
+        let roll = options.roll ?? 0.0;         // TODO: implement
+
+        let rollQuat = new THREE.Quaternion();
+        rollQuat.setFromAxisAngle(new THREE.Vector3(0, 0, 1), roll);
+
+        let quat = new THREE.Quaternion();
+
+        if (setRotation) {
+            switch (axis.toLocaleLowerCase()) {
+                case "x":
+                case "+x":
+                    quat.setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI * 0.5);
+                    break;
+    
+                case "y":
+                case "+y":
+                    quat.setFromAxisAngle(new THREE.Vector3(-1, 0, 0), Math.PI * 0.5);
+                    break;
+    
+                case "z":
+                case "+z":
+                    quat.setFromAxisAngle(new THREE.Vector3(1, 0, 0), 0.0);
+                    break;
+    
+                case "-x":
+                    quat.setFromAxisAngle(new THREE.Vector3(0, 1, 0), -Math.PI * 0.5);
+                    break;
+    
+                case "-y":
+                    quat.setFromAxisAngle(new THREE.Vector3(-1, 0, 0), -Math.PI * 0.5);
+                    break;
+    
+                case "-z":
+                    quat.setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI);
+                    break;
+    
+                default:
+                    throw new Error(`Unkown axis ${axis}`);
+            }
+
+            part.rot.copy(quat);
+        }
+
+        part.rot.multiplyQuaternions(part.rot, rollQuat);
 
         // TODO: take rotation of global matrix into account
 
@@ -644,6 +665,10 @@ class Factory {
 
         let transPos = new THREE.Vector3(...pos);
         transPos.applyMatrix4(this.currentMatrix());
+
+        // part.rot.
+
+        // this.curren
         part.pos = transPos;
         part.group = this.currentGroup;
 

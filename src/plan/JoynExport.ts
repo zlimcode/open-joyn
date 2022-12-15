@@ -47,6 +47,9 @@ class JoynConstruction {
     name: string = "";
 
     @jsonMember(String)
+    permalink: string = "";
+
+    @jsonMember(String)
     description: string = "";
 
     @jsonMember(String)
@@ -59,9 +62,14 @@ class JoynConstruction {
 
 class JoynExport {
     private plan: Plan;
+    private permalink?: string;
 
-    constructor(plan: Plan) {
+    constructor(plan: Plan, permalink?: string) {
         this.plan = plan;
+
+        if (permalink) {
+            this.permalink = permalink;
+        }
     }
 
     generate() {
@@ -75,7 +83,9 @@ class JoynExport {
 
         const jmConstruction = new JoynConstruction();
 
-        jmConstruction.name = meta.name;
+        jmConstruction.name = this.plan.options.name;
+       
+        jmConstruction.style = this.plan.style.joynExport.constructionStyle;
 
         if (meta.description) {
             jmConstruction.description = meta.description;
@@ -84,19 +94,21 @@ class JoynExport {
         for (const group of barsByName.values()) {
             for (let barIdx = 0; barIdx < group.length; barIdx++) {
                 const bar = group[barIdx];
-                const name = `${bar.name}_${barIdx + 1}`;
+                const groupName = bar.group;
+                const stepIndex = this.plan.stepIndexForGroupName(groupName);
+                const stepName = `Step ${stepIndex + 1}`;
+
+                const name = `[${stepName}] ${bar.name}_${barIdx + 1}`;
 
                 let jmPart = new JoynPart();
                 jmPart.name = name;
                 jmPart.stock = bar.size;
                 jmPart.skeletonLength = bar.length;
 
-
                 for (const hole of bar.holes) {
                     let joint = new JoynJointInstance();
 
-                    joint.template = "34x34_fullpeg";  // TODO: to config
-
+                    joint.template = this.plan.style.joynExport.jointTemplate;
                     joint.side = hole.side;
                     joint.position = -hole.position;
                     // joint.rotation
@@ -108,6 +120,9 @@ class JoynExport {
             }
         }
 
+        if (this.permalink) {
+            jmConstruction.permalink = this.permalink;
+        }
 
         return jmConstruction;
     }
